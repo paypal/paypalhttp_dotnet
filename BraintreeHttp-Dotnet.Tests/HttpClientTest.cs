@@ -82,7 +82,7 @@ namespace BraintreeHttp_Dotnet.Tests
         }
 
         [Fact]
-        public async void testHttpClient_Execute_SetsUserAgentHeader()
+        public async void testHttpClient_Execute_UsesDefaultUserAgentHeader()
         {
             server
             .Given(
@@ -93,12 +93,33 @@ namespace BraintreeHttp_Dotnet.Tests
             var request = new BraintreeHttp.HttpRequest("/", HttpMethod.Get);
             var resp = await client().Execute(request);
 
-            Assert.Equal("BraintreeHttp-Dotnet", GetLastRequest().RequestMessage.Headers["User-Agent"]);
+            Assert.Equal("BraintreeHttp-Dotnet HTTP/1.1", GetLastRequest().RequestMessage.Headers["User-Agent"]);
         }
 
         [Fact]
-        public void TestHttpClient_execute_SSL()
+        public async void TestHttpClient_execute_SSL()
         {
+            server = WireMock.Server.FluentMockServer.Start(new WireMock.Settings.FluentMockServerSettings()
+            {
+                UseSSL = true
+            });
+            System.Threading.Thread.Sleep(200);
+
+			server
+			 .Given(
+			   Request.Create().WithPath("/").UsingGet()
+			 )
+			 .RespondWith(
+			   Response.Create()
+				 .WithStatusCode(200)
+			 );
+
+            var sslClient = new BraintreeHttp.HttpClient(new TestEnvironment(server.Ports[0], true));
+
+			var request = new BraintreeHttp.HttpRequest("/", HttpMethod.Get);
+
+			var resp = await sslClient.Execute(request);
+            Assert.Equal(System.Net.HttpStatusCode.OK, resp.StatusCode);
         }
 
         [Fact]

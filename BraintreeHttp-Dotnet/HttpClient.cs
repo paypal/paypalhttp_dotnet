@@ -18,9 +18,11 @@ namespace BraintreeHttp
         {
             this.Environment = environment;
             this.Injectors = new List<Injector>();
+            this.AddInjector(new UserAgentInjector(this.GetUserAgent()));
 
             Client = new System.Net.Http.HttpClient();
             Client.BaseAddress = new Uri(Environment.BaseUrl());
+            Client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
         }
 
         protected string GetUserAgent()
@@ -76,5 +78,20 @@ namespace BraintreeHttp
 
             return theContent;
 		}
+
+        private class UserAgentInjector: Injector
+        {
+            private string UserAgent;
+
+            public UserAgentInjector(string UserAgent)
+            {
+                this.UserAgent = UserAgent;
+            }
+
+            public void Inject(HttpRequest request)
+            {
+            //    request.Headers.UserAgent = this.UserAgent;
+            }
+        }
     }
 }

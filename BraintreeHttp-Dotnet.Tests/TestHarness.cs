@@ -7,16 +7,19 @@ namespace BraintreeHttp_Dotnet.Tests
 	public class TestEnvironment : BraintreeHttp.Environment
 	{
 
-		public TestEnvironment(int port)
+		public TestEnvironment(int port, bool useSSL = false)
 		{
 			this.port = port;
+            this.useSSL = useSSL;
 		}
 
 		public int port;
+        bool useSSL;
 
 		public string BaseUrl()
         {
-			return "http://localhost:" + port;
+            var scheme = this.useSSL ? "https" : "http";
+            return scheme + "://localhost:" + port;
 		}
 	}
 
