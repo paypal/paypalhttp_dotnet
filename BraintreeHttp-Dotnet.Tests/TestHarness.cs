@@ -38,7 +38,7 @@ namespace BraintreeHttp_Dotnet.Tests
     		server.Stop();
     	}
 
-    	protected BraintreeHttp.HttpClient client()
+        protected BraintreeHttp.HttpClient Client()
         {
             return new BraintreeHttp.HttpClient(new TestEnvironment(server.Ports[0]));
         }

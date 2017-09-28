@@ -2,27 +2,26 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Runtime.Serialization.Json;
-using System.IO;
 
 
 namespace BraintreeHttp
 {
     public class HttpClient
     {
-        private Environment Environment;
-        private System.Net.Http.HttpClient Client;
-        private List<Injector> Injectors;
+        private Environment environment;
+        private System.Net.Http.HttpClient client;
+        private List<IInjector> injectors;
+        private Encoder encoder;
 
         public HttpClient(Environment environment)
         {
-            this.Environment = environment;
-            this.Injectors = new List<Injector>();
-            this.AddInjector(new UserAgentInjector(this.GetUserAgent()));
+            this.environment = environment;
+            this.injectors = new List<IInjector>();
+            this.encoder = new Encoder();
 
-            Client = new System.Net.Http.HttpClient();
-            Client.BaseAddress = new Uri(Environment.BaseUrl());
-            Client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
+            client = new System.Net.Http.HttpClient();
+            client.BaseAddress = new Uri(environment.BaseUrl());
+            client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
         }
 
         protected string GetUserAgent()
@@ -30,68 +29,58 @@ namespace BraintreeHttp
             return "BraintreeHttp-Dotnet HTTP/1.1";
         }
 
-        public void AddInjector(Injector injector)
+        public void AddInjector(IInjector injector)
         {
             if (injector != null)
             {
-                this.Injectors.Add(injector);
+                this.injectors.Add(injector);
             }
+        }
+
+        public void SetConnectTimeout(TimeSpan timeout)
+        {
+            client.Timeout = timeout;
         }
 
         public async Task<HttpResponse> Execute(HttpRequest request)
         {
-            request.RequestUri = new Uri(this.Environment.BaseUrl() + request.Path);
+            foreach (var injector in injectors) {
+                injector.Inject(request);
+            }
+
+            request.RequestUri = new Uri(this.environment.BaseUrl() + request.Path);
 
             if (request.Body != null)
             {
                 request.Content = this.SerializeRequest(request);
             }
 
-			var response = await Client.SendAsync(request);
+			var response = await client.SendAsync(request);
 
-    		var responseBody = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
-                return new HttpResponse(response.Headers, response.StatusCode, "");
+                object responseBody = null;
+                if (response.Content.Headers.ContentType != null)
+                {
+                    responseBody = DeserializeResponse(response.Content, request.ResponseType);
+                }
+                return new HttpResponse(response.Headers, response.StatusCode, responseBody);
             }
             else
             {
-                throw new HttpException(response.StatusCode, response.Headers, responseBody);
+				var responseBody = await response.Content.ReadAsStringAsync();
+				throw new HttpException(response.StatusCode, response.Headers, responseBody);
             }
         }
 
-        //protected T DeserializeResponse<T>(HttpContent content)
-        //{
-
-        //}
+        protected object DeserializeResponse(HttpContent content, Type responseType)
+        {
+            return encoder.DeserializeResponse(content, responseType);
+        }
 
         protected HttpContent SerializeRequest(HttpRequest request)
         {
-            DataContractJsonSerializer jsonSer = new DataContractJsonSerializer(request.Body.GetType());
-
-			MemoryStream ms = new MemoryStream();
-            jsonSer.WriteObject(ms, request.Body);
-			ms.Position = 0;
-
-			StreamReader sr = new StreamReader(ms);
-			StringContent theContent = new StringContent(sr.ReadToEnd(), System.Text.Encoding.UTF8, "application/json");
-
-            return theContent;
+            return encoder.SerializeRequest(request);
 		}
-
-        private class UserAgentInjector: Injector
-        {
-            private string UserAgent;
-
-            public UserAgentInjector(string UserAgent)
-            {
-                this.UserAgent = UserAgent;
-            }
-
-            public void Inject(HttpRequest request)
-            {
-            //    request.Headers.UserAgent = this.UserAgent;
-            }
-        }
     }
 }

@@ -8,13 +8,19 @@ namespace BraintreeHttp
     {
         public HttpHeaders Headers          { get; }
     	public HttpStatusCode StatusCode    { get; }
-		public object Result                     { get; }
+
+        private object result; 
 
         public HttpResponse(HttpHeaders headers, HttpStatusCode statusCode, object result)
         {
             this.Headers = headers;
             this.StatusCode = statusCode;
-            this.Result = result;
+            this.result = result;
+        }
+
+        public T Result<T>()
+        {
+            return (T)this.result;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace BraintreeHttp
 {
-	public interface Injector
+	public interface IInjector
     {
         void Inject(HttpRequest request);
     }
