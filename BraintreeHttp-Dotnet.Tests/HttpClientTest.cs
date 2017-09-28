@@ -4,6 +4,7 @@ using System;
 using System.Runtime.Serialization;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Matchers;
@@ -25,7 +26,7 @@ namespace BraintreeHttp_Dotnet.Tests
 		}
 	}
 
-	public class HttpClientTest : TestHarness
+    public class HttpClientTest : TestHarness
     {
 
         [Fact]
@@ -98,27 +99,6 @@ namespace BraintreeHttp_Dotnet.Tests
         }
 
         [Fact]
-        public async void Execute_RespectsConnectTimeout()
-        {
-            var httpClient = Client();
-            httpClient.SetConnectTimeout(TimeSpan.FromMilliseconds(5));
-
-            var request = new HttpRequest("/", HttpMethod.Get);
-
-            try
-            {
-                var resp = await httpClient.Execute(request);
-                Console.WriteLine("Resp executed");
-                Assert.True(false, "Execute should have thrown on a connect timeout");
-            }
-            catch (HttpRequestException e)
-            {
-                Assert.NotNull(e);
-                Console.WriteLine($"Exception thrown => {e}");
-            }
-        }
-
-        [Fact]
         public async void Execute_writesDataFromRequestIfPresent()
         {
             server.Given(
@@ -131,11 +111,11 @@ namespace BraintreeHttp_Dotnet.Tests
 
             var request = new HttpRequest("/", HttpMethod.Post);
             request.Body = "some text here";
+            request.ContentType = "text/plain";
 
             var response = await Client().Execute(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            Console.WriteLine(GetLastRequest().RequestMessage.Body);
         }
 
         [Fact]
@@ -186,7 +166,7 @@ namespace BraintreeHttp_Dotnet.Tests
 				Response.Create().WithStatusCode(200)
 			);
 			var request = new HttpRequest("/", HttpMethod.Post, typeof(void));
-            request.Headers.Add("Content-Type", "application/json");
+            request.ContentType = "application/json";
             request.Body = new TestData
             {
                 Name = "braintree"
@@ -207,9 +187,9 @@ namespace BraintreeHttp_Dotnet.Tests
 			).RespondWith(
 				Response.Create().WithStatusCode(200)
 				.WithBody("{\"name\":\"braintree\"}")
-                .WithHeader("Content-Type", "application/json")
+                .WithHeader("Content-Type", "application/json; charset=utf-8")
 			);
-            var request = new HttpRequest("/", HttpMethod.Get);
+            var request = new HttpRequest("/", HttpMethod.Get, typeof(TestData));
 
             var response = await Client().Execute(request);
 

@@ -15,15 +15,27 @@ namespace BraintreeHttp
         public object DeserializeResponse(HttpContent content, Type responseType)
         {
             var jsonSerializer = new DataContractJsonSerializer(responseType);
+            var jsonString = content.ReadAsStringAsync().Result;
 
-            using (var contentStream = content.ReadAsStreamAsync().Result) {
-                return jsonSerializer.ReadObject(contentStream);
+            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+            {
+                return jsonSerializer.ReadObject(ms);
             }
         }
 
         public HttpContent SerializeRequest(HttpRequest request)
         {
-            throw new NotImplementedException();
-        }
+            var jsonSerializer = new DataContractJsonSerializer(request.Body.GetType());
+
+            using (var ms = new MemoryStream())
+            {
+				jsonSerializer.WriteObject(ms, request.Body);
+                ms.Position = 0;
+				using (var sr = new StreamReader(ms))
+                {
+                    return new StringContent(sr.ReadToEnd());
+				}
+			}
+		}
     }
 }

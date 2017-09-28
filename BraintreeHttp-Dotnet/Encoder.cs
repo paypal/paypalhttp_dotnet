@@ -14,7 +14,8 @@ namespace BraintreeHttp
         {
             serializers = new List<ISerializer>();
             RegisterSerializer(new JsonSerializer());
-        }
+            RegisterSerializer(new TextSerializer());
+		}
 
         public void RegisterSerializer(ISerializer serializer)
         {
@@ -26,24 +27,20 @@ namespace BraintreeHttp
 
         public HttpContent SerializeRequest(HttpRequest request)
         {
-            string contentType = null;
-            foreach (var cType in request.Headers.GetValues("Content-Type"))
-            {
-                contentType = cType;
-                break;
-            }
-
-            if (contentType == null)
+            if (request.ContentType == null)
             {
                 throw new Exception("HttpRequest did not have content-type header set");
             }
-            ISerializer serializer = GetSerializer(contentType);
+            ISerializer serializer = GetSerializer(request.ContentType);
             if (serializer == null)
             {
-                throw new Exception($"Unable to serialize request with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
+                throw new Exception($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
-            return serializer.SerializeRequest(request);
+            var content = serializer.SerializeRequest(request);
+            content.Headers.ContentType = new MediaTypeHeaderValue(request.ContentType);
+
+            return content;
         }
 
         public object DeserializeResponse(HttpContent content, Type responseType)
