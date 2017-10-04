@@ -1,7 +1,7 @@
 ﻿using System;
 using WireMock.Server;
 
-namespace BraintreeHttp_Dotnet.Tests
+namespace BraintreeHttp.Tests
 {
 
 	public class TestEnvironment : BraintreeHttp.Environment

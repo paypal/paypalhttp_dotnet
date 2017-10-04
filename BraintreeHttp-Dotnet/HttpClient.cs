@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-
 namespace BraintreeHttp
 {
     public class HttpClient
     {
+        public Encoder Encoder { get; }
+
         private Environment environment;
         private System.Net.Http.HttpClient client;
         private List<IInjector> injectors;
-        private Encoder encoder;
 
         public HttpClient(Environment environment)
         {
             this.environment = environment;
             this.injectors = new List<IInjector>();
-            this.encoder = new Encoder();
+            this.Encoder = new Encoder();
 
             client = new System.Net.Http.HttpClient();
             client.BaseAddress = new Uri(environment.BaseUrl());
@@ -52,7 +52,7 @@ namespace BraintreeHttp
 
             if (request.Body != null)
             {
-                request.Content = this.SerializeRequest(request);
+                request.Content = Encoder.SerializeRequest(request);
             }
 
 			var response = await client.SendAsync(request);
@@ -62,7 +62,7 @@ namespace BraintreeHttp
                 object responseBody = null;
                 if (response.Content.Headers.ContentType != null)
                 {
-                    responseBody = DeserializeResponse(response.Content, request.ResponseType);
+                    responseBody = Encoder.DeserializeResponse(response.Content, request.ResponseType);
                 }
                 return new HttpResponse(response.Headers, response.StatusCode, responseBody);
             }
@@ -72,15 +72,5 @@ namespace BraintreeHttp
 				throw new HttpException(response.StatusCode, response.Headers, responseBody);
             }
         }
-
-        protected object DeserializeResponse(HttpContent content, Type responseType)
-        {
-            return encoder.DeserializeResponse(content, responseType);
-        }
-
-        protected HttpContent SerializeRequest(HttpRequest request)
-        {
-            return encoder.SerializeRequest(request);
-		}
     }
 }

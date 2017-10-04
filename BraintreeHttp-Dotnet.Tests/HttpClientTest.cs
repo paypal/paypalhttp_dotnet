@@ -9,7 +9,7 @@ using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Matchers;
 
-namespace BraintreeHttp_Dotnet.Tests
+namespace BraintreeHttp.Tests
 {
     [DataContract]
     public class TestData

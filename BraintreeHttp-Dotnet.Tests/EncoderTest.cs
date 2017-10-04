@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace BraintreeHttp_Dotnet.Tests
+namespace BraintreeHttp.Tests
 {
 	public class EncoderTest
     {
