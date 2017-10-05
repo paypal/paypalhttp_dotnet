@@ -8,8 +8,8 @@ namespace BraintreeHttp
 
         public object DeserializeResponse(HttpContent content, Type responseType)
         {
-			return content.ReadAsStringAsync().Result;
-		}
+            return content.ReadAsStringAsync().Result;
+        }
 
         public string GetContentTypeRegexPattern()
         {

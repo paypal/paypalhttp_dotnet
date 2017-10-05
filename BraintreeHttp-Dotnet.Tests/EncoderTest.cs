@@ -2,6 +2,8 @@
 using System.Net.Http;
 using Xunit;
 using System.Text;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BraintreeHttp.Tests
 {
@@ -54,11 +56,28 @@ namespace BraintreeHttp.Tests
 
             var encoder = new Encoder();
             var content = encoder.SerializeRequest(request);
-            Assert.Equal("application/json", content.Headers.ContentType.ToString());
+            Assert.StartsWith("application/json", content.Headers.ContentType.ToString());
 
             var jsonString = await content.ReadAsStringAsync();
 
             Assert.Equal("{\"name\":\"braintree\"}", jsonString);
+        }
+
+        [Fact]
+        public void SerializeRequest_WithMultipartContentTypeAsync()
+        {
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"hello", "world"},
+                {"something", "Else"},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
         }
 
         [Fact]
@@ -70,7 +89,7 @@ namespace BraintreeHttp.Tests
 
             var encoder = new Encoder();
             var content = encoder.SerializeRequest(request);
-            Assert.Equal("text/plain", content.Headers.ContentType.ToString());
+            Assert.StartsWith("text/plain", content.Headers.ContentType.ToString());
 
             var textString = await content.ReadAsStringAsync();
             Assert.Equal("some plain text", textString);
@@ -133,6 +152,23 @@ namespace BraintreeHttp.Tests
 
             Assert.NotNull(content);
             Assert.Equal("some plain text", content);
+        }
+
+        [Fact]
+        public void DeserializeResponse_throwsForMultipartContentType()
+        {
+            var responseContent = new StringContent("some data", Encoding.UTF8, "multipart/form-data");
+
+            var encoder = new Encoder();
+            try
+            {
+                var content = encoder.DeserializeResponse(responseContent, typeof(String));
+                Assert.True(false, "We do not deserialize multipart data");
+            }
+            catch (System.IO.IOException ex)
+            {
+                Assert.Equal("Unable to deserialize Content-Type: multipart/form-data.", ex.Message);
+            }
         }
     }
 }

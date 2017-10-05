@@ -5,7 +5,7 @@ using System.IO;
 
 namespace BraintreeHttp
 {
-    public class JsonSerializer: ISerializer
+    public class JsonSerializer : ISerializer
     {
         public string GetContentTypeRegexPattern()
         {
@@ -29,13 +29,13 @@ namespace BraintreeHttp
 
             using (var ms = new MemoryStream())
             {
-				jsonSerializer.WriteObject(ms, request.Body);
+                jsonSerializer.WriteObject(ms, request.Body);
                 ms.Position = 0;
-				using (var sr = new StreamReader(ms))
+                using (var sr = new StreamReader(ms))
                 {
-                    return new StringContent(sr.ReadToEnd());
-				}
-			}
-		}
+                    return new StringContent(sr.ReadToEnd(), System.Text.Encoding.UTF8, "application/json");
+                }
+            }
+        }
     }
 }

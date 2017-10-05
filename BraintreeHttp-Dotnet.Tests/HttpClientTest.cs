@@ -8,6 +8,8 @@ using System.Net.Http.Headers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Matchers;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BraintreeHttp.Tests
 {
@@ -28,7 +30,6 @@ namespace BraintreeHttp.Tests
 
     public class HttpClientTest : TestHarness
     {
-
         [Fact]
         public async void Execute_throwsExceptionForNonSuccessfulStatusCodes()
         {

@@ -16,7 +16,8 @@ namespace BraintreeHttp
             serializers = new List<ISerializer>();
             RegisterSerializer(new JsonSerializer());
             RegisterSerializer(new TextSerializer());
-		}
+            RegisterSerializer(new MultipartSerializer());
+        }
 
         public void RegisterSerializer(ISerializer serializer)
         {
@@ -39,7 +40,6 @@ namespace BraintreeHttp
             }
 
             var content = serializer.SerializeRequest(request);
-            content.Headers.ContentType = new MediaTypeHeaderValue(request.ContentType);
 
             return content;
         }
