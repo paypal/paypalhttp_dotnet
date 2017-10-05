@@ -18,13 +18,13 @@ namespace BraintreeHttp.Tests
         public string Name;
     }
 
-	class TestInjector : IInjector
-	{
-		public void Inject(HttpRequest request)
-		{
-			request.Headers.Add("User-Agent", "Custom Injector");
-		}
-	}
+    class TestInjector : IInjector
+    {
+        public void Inject(HttpRequest request)
+        {
+            request.Headers.Add("User-Agent", "Custom Injector");
+        }
+    }
 
     public class HttpClientTest : TestHarness
     {
@@ -121,17 +121,17 @@ namespace BraintreeHttp.Tests
         [Fact]
         public async void Execute_doesNotWriteDataFromRequestIfNotPresent()
         {
-			server.Given(
-				Request.Create().WithPath("/")
-				.UsingPost()
-			).RespondWith(
-				Response.Create().WithStatusCode(200)
-			);
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingPost()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
 
             var request = new HttpRequest("/", HttpMethod.Post);
 
-			var response = await Client().Execute(request);
-			Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var response = await Client().Execute(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             Assert.Equal("", GetLastRequest().RequestMessage.Body);
         }
@@ -139,80 +139,80 @@ namespace BraintreeHttp.Tests
         [Fact]
         public async void AddInjector_usesCustomInjectorsToModifyRequest()
         {
-			server.Given(
-				Request.Create().WithPath("/")
-				.UsingGet()
-			).RespondWith(
-				Response.Create().WithStatusCode(200)
-			);
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingGet()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
 
-			var request = new HttpRequest("/", HttpMethod.Get);
+            var request = new HttpRequest("/", HttpMethod.Get);
             var client = Client();
 
             client.AddInjector(new TestInjector());
 
             var response = await client.Execute(request);
             Assert.Equal("Custom Injector", GetLastRequest().RequestMessage.Headers["User-Agent"]);
-		}
+        }
 
         [Fact]
         public async void Execute_withData_SerializesDataAccordingToContentType()
         {
-			server.Given(
-				Request.Create().WithPath("/")
-				.UsingPost()
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingPost()
                 .WithBody("{\"name\":\"braintree\"}")
-			).RespondWith(
-				Response.Create().WithStatusCode(200)
-			);
-			var request = new HttpRequest("/", HttpMethod.Post, typeof(void));
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
+            var request = new HttpRequest("/", HttpMethod.Post, typeof(void));
             request.ContentType = "application/json";
             request.Body = new TestData
             {
                 Name = "braintree"
             };
 
-			var client = Client();
+            var client = Client();
 
             var response = await client.Execute(request);
-			Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-		}
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
 
         [Fact]
         public async void Execute_withReturnData_DeserializesAccordingToContentType()
         {
-			server.Given(
-				Request.Create().WithPath("/")
-				.UsingGet()
-			).RespondWith(
-				Response.Create().WithStatusCode(200)
-				.WithBody("{\"name\":\"braintree\"}")
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingGet()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+                .WithBody("{\"name\":\"braintree\"}")
                 .WithHeader("Content-Type", "application/json; charset=utf-8")
-			);
+            );
             var request = new HttpRequest("/", HttpMethod.Get, typeof(TestData));
 
             var response = await Client().Execute(request);
 
             Assert.Equal("braintree", response.Result<TestData>().Name);
-		}
+        }
 
         [Fact]
         public async void AddInjector_withNull_doesNotThrow()
         {
-			server.Given(
-				Request.Create().WithPath("/")
-				.UsingGet()
-			).RespondWith(
-				Response.Create().WithStatusCode(200)
-			);
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingGet()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
 
-			var request = new HttpRequest("/", HttpMethod.Get);
-			var client = Client();
+            var request = new HttpRequest("/", HttpMethod.Get);
+            var client = Client();
 
             client.AddInjector(null);
 
             await client.Execute(request);
-		}
+        }
 
         private WireMock.Logging.LogEntry GetLastRequest()
         {

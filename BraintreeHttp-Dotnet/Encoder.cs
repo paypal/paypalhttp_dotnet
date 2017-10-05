@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -29,12 +30,12 @@ namespace BraintreeHttp
         {
             if (request.ContentType == null)
             {
-                throw new Exception("HttpRequest did not have content-type header set");
+                throw new IOException("HttpRequest did not have content-type header set");
             }
             ISerializer serializer = GetSerializer(request.ContentType);
             if (serializer == null)
             {
-                throw new Exception($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
+                throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
             var content = serializer.SerializeRequest(request);
@@ -47,13 +48,13 @@ namespace BraintreeHttp
         {
             if (content.Headers.ContentType == null)
             {
-                throw new Exception("HTTP response did not have content-type header set");
+                throw new IOException("HTTP response did not have content-type header set");
             }
             var contentType = content.Headers.ContentType.ToString();
             ISerializer serializer = GetSerializer(contentType);
             if (serializer == null)
             {
-                throw new Exception($"Unable to deserialize request with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
+                throw new IOException($"Unable to deserialize response with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
             return serializer.DeserializeResponse(content, responseType);

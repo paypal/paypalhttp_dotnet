@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.IO;
 using System.Net.Http;
 using System.Net;
 using System.Net.Http.Headers;
 namespace BraintreeHttp
 {
-    public class HttpException: HttpRequestException
+    public class HttpException: IOException
     {
         public HttpStatusCode StatusCode { get; }
 		public HttpHeaders Headers { get; }

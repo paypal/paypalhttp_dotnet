@@ -30,8 +30,7 @@ namespace BraintreeHttp.Tests
 		public TestHarness()
         {
 			server = FluentMockServer.Start();
-			System.Threading.Thread.Sleep(200);
-		}
+    	}
 
     	public void Dispose()
     	{
