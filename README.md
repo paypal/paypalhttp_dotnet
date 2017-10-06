@@ -73,7 +73,7 @@ catch (HttpException ex)
 ```
 
 ## License
-BraintreeHttp-dotnet is open source and available under the MIT license. See the [LICENSE](./LICENSE) file for more information.
+BraintreeHttp-Dotnet is open source and available under the MIT license. See the [LICENSE](./LICENSE) file for more information.
 
 ## Contributing
 Pull requests and issues are welcome. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
