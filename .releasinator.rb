@@ -69,7 +69,7 @@ configatron.update_version_method = method(:update_version_method)
 
 def publish_to_package_manager(version)
   nupkg = "BraintreeHttp-Dotnet/bin/Release/BraintreeHttp-Dotnet.#{version}.nupkg"
-  CommandProcessor.command("dotnet nuget push #{nupkg}")
+  CommandProcessor.command("nuget push #{nupkg}")
 end
 
 def wait_for_package_manager(version)
