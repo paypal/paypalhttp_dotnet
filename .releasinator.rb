@@ -64,7 +64,6 @@ def update_version_method(version, semver_type)
   File.open(CSPROJ, 'w') do |f|
     f << xml.to_html
   end
-  abort
 end
 
 configatron.update_version_method = method(:update_version_method)
