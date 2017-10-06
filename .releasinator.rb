@@ -44,13 +44,12 @@ configatron.custom_validation_methods = [
   method(:test),
 ]
 
-# Build, update version, and publish to PyPi
 def clean
   CommandProcessor.command("dotnet clean")
 end
 
 def build_method
-  CommandProcessor.command("dotnet pack -c Relase")
+  CommandProcessor.command("dotnet pack -c Release BraintreeHttp-Dotnet")
 end
 
 configatron.build_method = method(:build_method)
