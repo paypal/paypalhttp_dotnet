@@ -5,7 +5,7 @@ CSPROJ = "BraintreeHttp-Dotnet/BraintreeHttp-Dotnet.csproj"
 
 # Custom validations
 def test
-  CommandProcessor.command("dotnet test", live_output=true)
+  CommandProcessor.command("dotnet test BraintreeHttp-Dotnet.Tests", live_output=true)
 end
 
 def package_version
