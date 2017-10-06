@@ -24,7 +24,7 @@ namespace BraintreeHttp
             client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
         }
 
-        protected string GetUserAgent()
+        protected virtual string GetUserAgent()
         {
             return "BraintreeHttp-Dotnet HTTP/1.1";
         }
