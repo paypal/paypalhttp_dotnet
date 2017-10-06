@@ -74,6 +74,11 @@ def publish_to_package_manager(version)
 end
 
 configatron.publish_to_package_manager_method = method(:publish_to_package_manager)
+configatron.wait_for_package_manager_method = method(:wait_for_package_manager)
+
+def wait_for_package_manager(version)
+  # noop
+end
 
 # Miscellania
 configatron.release_to_github = true
