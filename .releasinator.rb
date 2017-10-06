@@ -73,12 +73,12 @@ def publish_to_package_manager(version)
   Printer.ask_binary("Go to https://www.nuget.org/packages/manage/upload as Braintreepayments and upload the new pacakge")
 end
 
-configatron.publish_to_package_manager_method = method(:publish_to_package_manager)
-configatron.wait_for_package_manager_method = method(:wait_for_package_manager)
-
 def wait_for_package_manager(version)
   # noop
 end
+
+configatron.publish_to_package_manager_method = method(:publish_to_package_manager)
+configatron.wait_for_package_manager_method = method(:wait_for_package_manager)
 
 # Miscellania
 configatron.release_to_github = true
