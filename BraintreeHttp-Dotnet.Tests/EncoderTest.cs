@@ -96,6 +96,26 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
+        public async void SerializeReqeust_WithFormEncodedContentType()
+        {
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.Body = new Dictionary<string, string>()
+            {
+                {"hello", "world"},
+                {"key", "value"},
+                {"another_key", "some value with spaces"},
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+            Assert.StartsWith("application/x-www-form-urlencoded", content.Headers.ContentType.ToString());
+
+            var textString = await content.ReadAsStringAsync();
+            Assert.Equal("hello=world&key=value&another_key=some+value+with+spaces", textString);
+        }
+
+        [Fact]
         public void DeserializeResponse_throwsForUnsupportedContentType()
         {
             var responseContent = new StringContent("some data", Encoding.UTF8, "application/unsupported");
@@ -168,6 +188,23 @@ namespace BraintreeHttp.Tests
             catch (System.IO.IOException ex)
             {
                 Assert.Equal("Unable to deserialize Content-Type: multipart/form-data.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void DeserializeResponse_throwsForFormEncodedContentType()
+        {
+            var responseContent = new StringContent("hello=world", Encoding.UTF8, "application/x-www-form-urlencoded");
+
+            var encoder = new Encoder();
+            try
+            {
+                var content = encoder.DeserializeResponse(responseContent, typeof(String));
+                Assert.True(false, "form encoded deserialization not supported");
+            }
+            catch (System.IO.IOException ex)
+            {
+                Assert.Equal("Unable to deserialize Content-Type: application/x-www-form-urlencoded.", ex.Message);
             }
         }
     }

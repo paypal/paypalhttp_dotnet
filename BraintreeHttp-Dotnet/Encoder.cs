@@ -17,6 +17,7 @@ namespace BraintreeHttp
             RegisterSerializer(new JsonSerializer());
             RegisterSerializer(new TextSerializer());
             RegisterSerializer(new MultipartSerializer());
+            RegisterSerializer(new FormEncodedSerializer());
         }
 
         public void RegisterSerializer(ISerializer serializer)
