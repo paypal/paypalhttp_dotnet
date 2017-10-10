@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Title>BraintreeHttp</Title>
-    <Version>0.1.3</Version>
+    <Version>0.1.4</Version>
     <Copyright>Copyright Braintree, a division of PayPal, Inc. 2017</Copyright>
     <Description>BraintreeHttp is a generic http client designed to be used with code-generated projects.</Description>
     <Authors>braintreepayments</Authors>
-    <PackageReleaseNotes>* Allow Path to be set in HttpRequest.</PackageReleaseNotes>
+    <PackageReleaseNotes>* Make environment property in HttpClient protected instead of private.</PackageReleaseNotes>
   </PropertyGroup>
 </Project>
