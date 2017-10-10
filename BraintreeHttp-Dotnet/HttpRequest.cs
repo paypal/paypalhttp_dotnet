@@ -5,7 +5,7 @@ namespace BraintreeHttp
 {
     public class HttpRequest : HttpRequestMessage
     {
-        public string Path          { get; }
+        public string Path          { get; set; }
         public object Body          { get; set; }
         public string ContentType   { get; set; }
         public Type ResponseType    { get; }

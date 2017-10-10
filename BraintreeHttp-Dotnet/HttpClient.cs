@@ -9,7 +9,7 @@ namespace BraintreeHttp
     {
         public Encoder Encoder { get; }
 
-        private Environment environment;
+        protected Environment environment;
         private System.Net.Http.HttpClient client;
         private List<IInjector> injectors;
 
