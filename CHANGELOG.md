@@ -1,3 +1,6 @@
+## 0.1.5
+* Mark Execute as virutal in HttpClient.
+
 ## 0.1.4
 * Support FormEncoded serialization.
 
