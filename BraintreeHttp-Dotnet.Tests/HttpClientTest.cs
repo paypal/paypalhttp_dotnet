@@ -116,7 +116,6 @@ namespace BraintreeHttp.Tests
 
             var response = await Client().Execute(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
         }
 
         [Fact]
@@ -135,6 +134,29 @@ namespace BraintreeHttp.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             Assert.Equal("", GetLastRequest().RequestMessage.Body);
+        }
+
+        [Fact]
+        public async void Execute_doesNotMutateOriginalRequest()
+        {
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingPost()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
+
+            var request = new HttpRequest("/", HttpMethod.Post);
+
+            var response = await Client().Execute(request);
+
+            var headerCount = 0;
+            foreach (var header in request.Headers) 
+            {
+                headerCount++;
+            }
+
+            Assert.Equal(0, headerCount);
         }
 
         [Fact]
