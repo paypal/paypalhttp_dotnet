@@ -6,7 +6,7 @@ namespace BraintreeHttp
     public class TextSerializer : ISerializer
     {
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public object Decode(HttpContent content, Type responseType)
         {
             return content.ReadAsStringAsync().Result;
         }
@@ -16,7 +16,7 @@ namespace BraintreeHttp
             return "^text/.*$";
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public HttpContent Encode(HttpRequest request)
         {
             return new StringContent(request.Body.ToString());
         }

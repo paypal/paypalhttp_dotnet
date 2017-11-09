@@ -15,12 +15,12 @@ namespace BraintreeHttp
             return "^multipart/.*$";
         }
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public object Decode(HttpContent content, Type responseType)
         {
             throw new IOException("Unable to deserialize Content-Type: multipart/form-data.");
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public HttpContent Encode(HttpRequest request)
         {
             if (!(request.Body is IDictionary))
             {

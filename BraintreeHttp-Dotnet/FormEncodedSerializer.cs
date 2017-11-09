@@ -13,12 +13,12 @@ namespace BraintreeHttp
             return "application/x-www-form-urlencoded";
         }
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public object Decode(HttpContent content, Type responseType)
         {
             throw new IOException($"Unable to deserialize Content-Type: {this.GetContentTypeRegexPattern()}.");
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public HttpContent Encode(HttpRequest request)
         {
             if (!(request.Body is IDictionary))
             {

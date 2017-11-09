@@ -40,7 +40,7 @@ namespace BraintreeHttp
                 throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
-            var content = serializer.SerializeRequest(request);
+            var content = serializer.Encode(request);
 
             return content;
         }
@@ -58,7 +58,7 @@ namespace BraintreeHttp
                 throw new IOException($"Unable to deserialize response with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
-            return serializer.DeserializeResponse(content, responseType);
+            return serializer.Decode(content, responseType);
         }
 
         private ISerializer GetSerializer(string contentType)

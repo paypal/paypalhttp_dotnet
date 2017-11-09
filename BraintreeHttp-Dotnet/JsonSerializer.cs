@@ -12,7 +12,7 @@ namespace BraintreeHttp
             return "application/json";
         }
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public object Decode(HttpContent content, Type responseType)
         {
             var jsonSerializer = new DataContractJsonSerializer(responseType);
             var jsonString = content.ReadAsStringAsync().Result;
@@ -23,7 +23,7 @@ namespace BraintreeHttp
             }
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public HttpContent Encode(HttpRequest request)
         {
             var jsonSerializer = new DataContractJsonSerializer(request.Body.GetType());
 
