@@ -1,3 +1,7 @@
+## 0.2.0
+* Add gzip support.
+* Ensure requests are immutable.
+
 ## 0.1.5
 * Mark Execute as virutal in HttpClient.
 
