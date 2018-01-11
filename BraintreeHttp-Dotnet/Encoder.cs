@@ -1,9 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BraintreeHttp
 {
@@ -42,6 +46,12 @@ namespace BraintreeHttp
 
             var content = serializer.Encode(request);
 
+            if ("gzip".Equals(request.ContentEncoding))
+            {
+                var source = content.ReadAsStringAsync().Result;
+                content = new ByteArrayContent(Gzip(source));
+            }
+
             return content;
         }
 
@@ -56,6 +66,14 @@ namespace BraintreeHttp
             if (serializer == null)
             {
                 throw new IOException($"Unable to deserialize response with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
+            }
+
+            var contentEncoding = content.Headers.ContentEncoding.FirstOrDefault();
+
+            if ("gzip".Equals(contentEncoding))
+            {
+                var buf = content.ReadAsByteArrayAsync().Result;
+                content = new StringContent(Gunzip(buf), Encoding.UTF8);
             }
 
             return serializer.Decode(content, responseType);
@@ -84,6 +102,48 @@ namespace BraintreeHttp
             }
 
             return String.Join(", ", contentTypes);
+        }
+
+        private static byte[] Gzip(string source)
+        {
+            var bytes = Encoding.UTF8.GetBytes(source);
+
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    msi.CopyTo(gs);
+                }
+
+                return mso.ToArray();
+            }
+        }
+
+        private static string Gunzip(byte[] source)
+        {
+            using (var msi = new MemoryStream(source))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    CopyTo(gs, mso);
+                }
+
+                return Encoding.UTF8.GetString(mso.ToArray());
+            }
+        }
+
+        private static void CopyTo(Stream src, Stream dest)
+        {
+            byte[] bytes = new byte[4096];
+
+            int cnt;
+
+            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                dest.Write(bytes, 0, cnt);
+            }
         }
     }
 }

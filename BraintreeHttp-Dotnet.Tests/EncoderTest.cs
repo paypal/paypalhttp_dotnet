@@ -4,6 +4,7 @@ using Xunit;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 
 namespace BraintreeHttp.Tests
 {
@@ -45,7 +46,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public async void SerializeRequest_WithJsonContentTypeAsync()
+        public async void SerializeRequest_withJsonContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "application/json";
@@ -64,7 +65,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public void SerializeRequest_WithMultipartContentTypeAsync()
+        public void SerializeRequest_withMultipartContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "multipart/form-data";
@@ -81,7 +82,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public async void SerializeRequest_WithTextContentTypeAsync()
+        public async void SerializeRequest_withTextContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "text/plain";
@@ -96,7 +97,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public async void SerializeReqeust_WithFormEncodedContentType()
+        public async void SerializeReqeust_withFormEncodedContentType()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "application/x-www-form-urlencoded";
@@ -113,6 +114,27 @@ namespace BraintreeHttp.Tests
 
             var textString = await content.ReadAsStringAsync();
             Assert.Equal("hello=world&key=value&another_key=some+value+with+spaces", textString);
+        }
+
+        [Fact]
+        public void SerializeRequest_withGzipContentEncoding() 
+        {
+            var encoder = new Encoder();
+            var request = new HttpRequest("/", HttpMethod.Get);
+
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentEncoding = "gzip";
+            request.Body = new Dictionary<string, string>()
+            {
+                {"hello", "world"},
+                {"key", "value"},
+                {"another_key", "some value with spaces"},
+            };
+
+            var content = encoder.SerializeRequest(request);
+            var buf = content.ReadAsByteArrayAsync().Result;
+
+            Assert.Equal(Gzip("hello=world&key=value&another_key=some+value+with+spaces"), buf);
         }
 
         [Fact]
@@ -151,7 +173,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public void DeserializeResponse_WithJsonContentType()
+        public void DeserializeResponse_withJsonContentType()
         {
             var responseContent = new StringContent("{\"name\":\"braintree\"}", Encoding.UTF8, "application/json");
 
@@ -163,7 +185,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public void DeserializeResponse_WithTextContentType()
+        public void DeserializeResponse_withTextContentType()
         {
             var responseContent = new StringContent("some plain text", Encoding.UTF8, "text/plain");
 
@@ -205,6 +227,37 @@ namespace BraintreeHttp.Tests
             catch (System.IO.IOException ex)
             {
                 Assert.Equal("Unable to deserialize Content-Type: application/x-www-form-urlencoded.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void DeserializeResponse_withGzipEncoding()
+        {
+            var encoder = new Encoder();
+
+            var content = "hello world";
+            var responseContent = new ByteArrayContent(Gzip(content));
+
+            responseContent.Headers.Add("Content-Type", "text/plain");
+            responseContent.Headers.ContentEncoding.Add("gzip");
+
+            var deserializedContent = encoder.DeserializeResponse(responseContent, typeof(string));
+
+            Assert.Equal(content, deserializedContent);
+        }
+
+        private static byte[] Gzip(string source)
+        {
+            var bytes = Encoding.UTF8.GetBytes(source);
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    msi.CopyTo(gs);
+                }
+
+                return mso.ToArray();
             }
         }
     }
