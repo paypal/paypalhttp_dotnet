@@ -3,10 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Title>BraintreeHttp</Title>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Copyright>Copyright Braintree, a division of PayPal, Inc. 2017</Copyright>
     <Description>BraintreeHttp is a generic http client designed to be used with code-generated projects.</Description>
     <Authors>braintreepayments</Authors>
-    <PackageReleaseNotes>* Mark Execute as virutal in HttpClient.</PackageReleaseNotes>
+    <PackageReleaseNotes>* Add gzip support.
+* Ensure requests are immutable.</PackageReleaseNotes>
   </PropertyGroup>
 </Project>

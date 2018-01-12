@@ -1,3 +1,6 @@
+## 0.2.1
+* Fix clone implementation.
+
 ## 0.2.0
 * Add gzip support.
 * Ensure requests are immutable.
