@@ -28,6 +28,11 @@ namespace BraintreeHttp.Tests
         }
     }
 
+    class SimpleRequest: HttpRequest
+    {
+        public SimpleRequest(): base("/", HttpMethod.Post, typeof(void)) {}
+    }
+
     public class HttpClientTest : TestHarness
     {
         [Fact]
@@ -146,7 +151,7 @@ namespace BraintreeHttp.Tests
                 Response.Create().WithStatusCode(200)
             );
 
-            var request = new HttpRequest("/", HttpMethod.Post);
+            var request = new SimpleRequest();
 
             var response = await Client().Execute(request);
 

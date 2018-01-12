@@ -42,9 +42,9 @@ namespace BraintreeHttp
             client.Timeout = timeout;
         }
 
-        public virtual async Task<HttpResponse> Execute(HttpRequest req)
+        public virtual async Task<HttpResponse> Execute<T>(T req) where T: HttpRequest
         {
-            var request = (HttpRequest)req.Clone();
+            var request = req.Clone<T>();
 
             foreach (var injector in injectors) {
                 injector.Inject(request);

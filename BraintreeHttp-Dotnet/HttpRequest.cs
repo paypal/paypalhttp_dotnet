@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 
 namespace BraintreeHttp
 {
-    public class HttpRequest : HttpRequestMessage, ICloneable
+    public class HttpRequest : HttpRequestMessage
     {
         public string Path              { get; set; }
         public object Body              { get; set; }
@@ -22,18 +22,9 @@ namespace BraintreeHttp
 
         public HttpRequest(string path, HttpMethod method) : this(path, method, typeof(void)) {}
 
-        public object Clone()
+        public T Clone<T>() where T: HttpRequest
         {
-            var other = new HttpRequest(this.Path, this.Method, this.ResponseType);
-            other.ContentType = this.ContentType;
-            other.ContentEncoding = this.ContentEncoding;
-            other.Body = this.Body;
-
-            foreach (var header in this.Headers)
-            {
-                other.Headers.Add(header.Key, header.Value);
-            }
-            return other;
+            return (T) this.MemberwiseClone();
         }
 	}
 }
