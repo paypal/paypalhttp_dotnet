@@ -119,7 +119,7 @@ namespace BraintreeHttp.Tests
             {
                 Name = "braintree"
             };
-            var jsonPart = new JsonPartContent("input", inputJSON);
+            var jsonPart = new JsonPartContent("input with space", inputJSON);
 
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "multipart/form-data";
@@ -135,7 +135,7 @@ namespace BraintreeHttp.Tests
             var body = await content.ReadAsStringAsync();
             Assert.Contains("{\"name\":\"braintree\"}", body);
             Assert.Contains("Content-Type: application/json", body);
-            Assert.Contains("Content-Disposition: form-data; filename=input.json; name=input", body);
+            Assert.Contains("Content-Disposition: form-data; filename=\"input with space.json\"; name=\"input with space\"", body);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
         }
 
