@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Xunit;
 using System.Text;
 using System.Collections.Generic;
@@ -82,6 +83,36 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
+        public async void SerializeRequest_withMultipartContentTypeAndHttpContentTypes()
+        {
+            var inputJSON = "{\"key\":\"val\"}";
+            var inputStringContent = new StringContent(inputJSON);
+            inputStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            inputStringContent.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
+            {
+                FileName = "input.json",
+                Name = "input"
+            };
+
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"input_key", inputStringContent},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+
+            var body = await content.ReadAsStringAsync();
+            Assert.Contains("{\"key\":\"val\"}", body);
+            Assert.Contains("Content-Type: application/json", body);
+            Assert.Contains("Content-Disposition: form-data; filename=input.json; name=input", body);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+        }
+
+        [Fact]
         public async void SerializeRequest_withTextContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
@@ -117,7 +148,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public void SerializeRequest_withGzipContentEncoding() 
+        public void SerializeRequest_withGzipContentEncoding()
         {
             var encoder = new Encoder();
             var request = new HttpRequest("/", HttpMethod.Get);

@@ -49,6 +49,10 @@ namespace BraintreeHttp
                         file.Dispose();
                     }
                 }
+                else if (item.Value is HttpContent)
+                {
+                    form.Add((HttpContent)item.Value, (string)item.Key);
+                }
                 else
                 {
                     form.Add(new StringContent((string)item.Value), (string)item.Key);
