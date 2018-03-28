@@ -113,6 +113,33 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
+        public async void SerializeRequest_withMultipartContentTypeAndJsonPartContent()
+        {
+            var inputJSON = new TestData
+            {
+                Name = "braintree"
+            };
+            var jsonPart = new JsonPartContent("input", inputJSON);
+
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"input_key", jsonPart},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+
+            var body = await content.ReadAsStringAsync();
+            Assert.Contains("{\"name\":\"braintree\"}", body);
+            Assert.Contains("Content-Type: application/json", body);
+            Assert.Contains("Content-Disposition: form-data; filename=input.json; name=input", body);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+        }
+
+        [Fact]
         public async void SerializeRequest_withTextContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
