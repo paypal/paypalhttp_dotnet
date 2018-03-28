@@ -35,15 +35,19 @@ namespace BraintreeHttp
                 if (item.Value is FileStream)
                 {
                     var file = (FileStream)item.Value;
-                    MemoryStream memoryStream = new MemoryStream();
-                    file.CopyTo(memoryStream);
-                    var fileContent = new ByteArrayContent(memoryStream.ToArray());
-                    fileContent.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
-                    {
-                        FileName = file.Name,
-                        Name = (string)item.Key
-                    };
-                    form.Add(fileContent);
+                    try {
+                        MemoryStream memoryStream = new MemoryStream();
+                        file.CopyTo(memoryStream);
+                        var fileContent = new ByteArrayContent(memoryStream.ToArray());
+                        fileContent.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
+                        {
+                            FileName = file.Name,
+                            Name = (string)item.Key
+                        };
+                        form.Add(fileContent);
+                    } finally {
+                        file.Dispose();
+                    }
                 }
                 else
                 {
