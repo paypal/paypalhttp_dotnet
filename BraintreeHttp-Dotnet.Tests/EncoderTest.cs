@@ -80,6 +80,7 @@ namespace BraintreeHttp.Tests
             var encoder = new Encoder();
             var content = encoder.SerializeRequest(request);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
         }
 
         [Fact]
@@ -88,11 +89,7 @@ namespace BraintreeHttp.Tests
             var inputJSON = "{\"key\":\"val\"}";
             var inputStringContent = new StringContent(inputJSON);
             inputStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            inputStringContent.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
-            {
-                FileName = "input.json",
-                Name = "input"
-            };
+            inputStringContent.Headers.Add("Content-Disposition", "form-data; name=\"input\"; filename=\"input.json\"");
 
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "multipart/form-data";
@@ -108,8 +105,9 @@ namespace BraintreeHttp.Tests
             var body = await content.ReadAsStringAsync();
             Assert.Contains("{\"key\":\"val\"}", body);
             Assert.Contains("Content-Type: application/json", body);
-            Assert.Contains("Content-Disposition: form-data; filename=input.json; name=input", body);
+            Assert.Contains("Content-Disposition: form-data; name=\"input\"; filename=\"input.json\"", body);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
         }
 
         [Fact]
@@ -119,7 +117,7 @@ namespace BraintreeHttp.Tests
             {
                 Name = "braintree"
             };
-            var jsonPart = new JsonPartContent("input with space", inputJSON);
+            var jsonPart = new JsonPartContent("input", inputJSON);
 
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "multipart/form-data";
@@ -135,8 +133,9 @@ namespace BraintreeHttp.Tests
             var body = await content.ReadAsStringAsync();
             Assert.Contains("{\"name\":\"braintree\"}", body);
             Assert.Contains("Content-Type: application/json", body);
-            Assert.Contains("Content-Disposition: form-data; filename=\"input with space.json\"; name=\"input with space\"", body);
+            Assert.Contains("Content-Disposition: form-data; name=\"input\"; filename=\"input.json\"", body);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
         }
 
         [Fact]

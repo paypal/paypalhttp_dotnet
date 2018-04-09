@@ -13,11 +13,8 @@ namespace BraintreeHttp
         public JsonPartContent(string partName, object json):
             base(serializeJson(json), System.Text.Encoding.UTF8, "application/json") {
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
-            {
-                FileName = partName + ".json",
-                Name = partName
-            };
+            // Need to ensure values are quoted
+            Headers.Add("Content-Disposition", "form-data; name=\"" + partName + "\"; filename=\"" + partName + ".json\"");
         }
 
         private static string serializeJson(object json) {
