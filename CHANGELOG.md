@@ -1,3 +1,8 @@
+## 0.3.0
+* Add multipart/form-data upload with JSON part support.
+* Allow HttpContent to be added directly to multipart requests as a value.
+* Add and remove quotes appropriately around name/value pairs for multipart requests.
+
 ## 0.2.1
 * Fix clone implementation.
 
