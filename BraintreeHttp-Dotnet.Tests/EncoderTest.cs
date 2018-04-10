@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Xunit;
 using System.Text;
 using System.Collections.Generic;
@@ -79,6 +80,62 @@ namespace BraintreeHttp.Tests
             var encoder = new Encoder();
             var content = encoder.SerializeRequest(request);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
+        }
+
+        [Fact]
+        public async void SerializeRequest_withMultipartContentTypeAndHttpContentTypes()
+        {
+            var inputJSON = "{\"key\":\"val\"}";
+            var inputStringContent = new StringContent(inputJSON);
+            inputStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            inputStringContent.Headers.Add("Content-Disposition", "form-data; name=\"input\"; filename=\"input.json\"");
+
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"input_key", inputStringContent},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+
+            var body = await content.ReadAsStringAsync();
+            Assert.Contains("{\"key\":\"val\"}", body);
+            Assert.Contains("Content-Type: application/json", body);
+            Assert.Contains("Content-Disposition: form-data; name=\"input\"; filename=\"input.json\"", body);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
+        }
+
+        [Fact]
+        public async void SerializeRequest_withMultipartContentTypeAndJsonPartContent()
+        {
+            var inputJSON = new TestData
+            {
+                Name = "braintree"
+            };
+            var jsonPart = new JsonPartContent("input", inputJSON);
+
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"input_key", jsonPart},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+
+            var body = await content.ReadAsStringAsync();
+            Assert.Contains("{\"name\":\"braintree\"}", body);
+            Assert.Contains("Content-Type: application/json", body);
+            Assert.Contains("Content-Disposition: form-data; name=\"input\"; filename=\"input.json\"", body);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
         }
 
         [Fact]
@@ -117,7 +174,7 @@ namespace BraintreeHttp.Tests
         }
 
         [Fact]
-        public void SerializeRequest_withGzipContentEncoding() 
+        public void SerializeRequest_withGzipContentEncoding()
         {
             var encoder = new Encoder();
             var request = new HttpRequest("/", HttpMethod.Get);
