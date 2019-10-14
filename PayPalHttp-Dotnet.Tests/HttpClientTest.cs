@@ -1,4 +1,4 @@
-using BraintreeHttp;
+using PayPalHttp;
 using Xunit;
 using System;
 using System.Runtime.Serialization;
@@ -11,7 +11,7 @@ using WireMock.Matchers;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BraintreeHttp.Tests
+namespace PayPalHttp.Tests
 {
     [DataContract]
     public class TestData
@@ -52,7 +52,7 @@ namespace BraintreeHttp.Tests
                 await Client().Execute(request);
                 Assert.True(false, "Expected client.Execute to throw HttpException");
             }
-            catch (BraintreeHttp.HttpException e)
+            catch (PayPalHttp.HttpException e)
             {
                 Assert.Equal(System.Net.HttpStatusCode.BadRequest, e.StatusCode);
             }
@@ -101,7 +101,7 @@ namespace BraintreeHttp.Tests
             var request = new HttpRequest("/", HttpMethod.Get);
             var resp = await Client().Execute(request);
 
-            Assert.Equal("BraintreeHttp-Dotnet HTTP/1.1", GetLastRequest().RequestMessage.Headers["User-Agent"]);
+            Assert.Equal("PayPalHttp-Dotnet HTTP/1.1", GetLastRequest().RequestMessage.Headers["User-Agent"]);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace BraintreeHttp.Tests
             var response = await Client().Execute(request);
 
             var headerCount = 0;
-            foreach (var header in request.Headers) 
+            foreach (var header in request.Headers)
             {
                 headerCount++;
             }
@@ -189,7 +189,7 @@ namespace BraintreeHttp.Tests
             server.Given(
                 Request.Create().WithPath("/")
                 .UsingPost()
-                .WithBody("{\"name\":\"braintree\"}")
+                .WithBody("{\"name\":\"paypal\"}")
             ).RespondWith(
                 Response.Create().WithStatusCode(200)
             );
@@ -197,7 +197,7 @@ namespace BraintreeHttp.Tests
             request.ContentType = "application/json";
             request.Body = new TestData
             {
-                Name = "braintree"
+                Name = "paypal"
             };
 
             var client = Client();
@@ -214,14 +214,15 @@ namespace BraintreeHttp.Tests
                 .UsingGet()
             ).RespondWith(
                 Response.Create().WithStatusCode(200)
-                .WithBody("{\"name\":\"braintree\"}")
+                .WithBody("{\"name\":\"\"}")
+                .WithBody("{\"name\":\"paypal\"}")
                 .WithHeader("Content-Type", "application/json; charset=utf-8")
             );
             var request = new HttpRequest("/", HttpMethod.Get, typeof(TestData));
 
             var response = await Client().Execute(request);
 
-            Assert.Equal("braintree", response.Result<TestData>().Name);
+            Assert.Equal("paypal", response.Result<TestData>().Name);
         }
 
         [Fact]

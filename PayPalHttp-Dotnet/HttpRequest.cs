@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class HttpRequest : HttpRequestMessage
     {
@@ -12,7 +12,7 @@ namespace BraintreeHttp
         public string ContentEncoding   { get; set; }
         public Type ResponseType        { get; }
 
-        public HttpRequest(string path, HttpMethod method, Type responseType) 
+        public HttpRequest(string path, HttpMethod method, Type responseType)
         {
             this.Path = path;
             this.ResponseType = responseType;

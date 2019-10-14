@@ -10,6 +10,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BraintreeHttp-Dotnet\BraintreeHttp-Dotnet.csproj" />
+    <ProjectReference Include="..\PayPalHttp-Dotnet\PayPalHttp-Dotnet.csproj" />
   </ItemGroup>
 </Project>

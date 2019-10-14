@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 
-namespace BraintreeHttp.Tests
+namespace PayPalHttp.Tests
 {
     public class EncoderTest
     {
@@ -53,7 +53,7 @@ namespace BraintreeHttp.Tests
             request.ContentType = "application/json";
             request.Body = new TestData
             {
-                Name = "braintree"
+                Name = "paypal"
             };
 
             var encoder = new Encoder();
@@ -62,7 +62,7 @@ namespace BraintreeHttp.Tests
 
             var jsonString = await content.ReadAsStringAsync();
 
-            Assert.Equal("{\"name\":\"braintree\"}", jsonString);
+            Assert.Equal("{\"name\":\"paypal\"}", jsonString);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace BraintreeHttp.Tests
         {
             var inputJSON = new TestData
             {
-                Name = "braintree"
+                Name = "paypal"
             };
             var jsonPart = new JsonPartContent("input", inputJSON);
 
@@ -131,7 +131,7 @@ namespace BraintreeHttp.Tests
             var content = encoder.SerializeRequest(request);
 
             var body = await content.ReadAsStringAsync();
-            Assert.Contains("{\"name\":\"braintree\"}", body);
+            Assert.Contains("{\"name\":\"paypal\"}", body);
             Assert.Contains("Content-Type: application/json", body);
             Assert.Contains("Content-Disposition: form-data; name=\"input\"; filename=\"input.json\"", body);
             Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
@@ -232,13 +232,13 @@ namespace BraintreeHttp.Tests
         [Fact]
         public void DeserializeResponse_withJsonContentType()
         {
-            var responseContent = new StringContent("{\"name\":\"braintree\"}", Encoding.UTF8, "application/json");
+            var responseContent = new StringContent("{\"name\":\"paypal\"}", Encoding.UTF8, "application/json");
 
             var encoder = new Encoder();
             var content = encoder.DeserializeResponse(responseContent, typeof(TestData));
 
             Assert.NotNull(content);
-            Assert.Equal("braintree", ((TestData)content).Name);
+            Assert.Equal("paypal", ((TestData)content).Name);
         }
 
         [Fact]

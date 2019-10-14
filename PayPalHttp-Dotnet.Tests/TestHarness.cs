@@ -1,10 +1,10 @@
 ﻿using System;
 using WireMock.Server;
 
-namespace BraintreeHttp.Tests
+namespace PayPalHttp.Tests
 {
 
-	public class TestEnvironment : BraintreeHttp.Environment
+	public class TestEnvironment : PayPalHttp.Environment
 	{
 
 		public TestEnvironment(int port, bool useSSL = false)
@@ -37,9 +37,9 @@ namespace BraintreeHttp.Tests
     		server.Stop();
     	}
 
-        protected BraintreeHttp.HttpClient Client()
+        protected PayPalHttp.HttpClient Client()
         {
-            return new BraintreeHttp.HttpClient(new TestEnvironment(server.Ports[0]));
+            return new PayPalHttp.HttpClient(new TestEnvironment(server.Ports[0]));
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class HttpClient
     {
@@ -26,7 +26,7 @@ namespace BraintreeHttp
 
         protected virtual string GetUserAgent()
         {
-            return "BraintreeHttp-Dotnet HTTP/1.1";
+            return "PayPalHttp-Dotnet HTTP/1.1";
         }
 
         public void AddInjector(IInjector injector)

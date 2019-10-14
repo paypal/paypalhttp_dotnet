@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class TextSerializer : ISerializer
     {

@@ -1,11 +1,11 @@
 require 'nokogiri'
 
-configatron.product_name = "BraintreeHttp Dotnet"
-CSPROJ = "BraintreeHttp-Dotnet/BraintreeHttp-Dotnet.csproj"
+configatron.product_name = "PayPalHttp Dotnet"
+CSPROJ = "PayPalHttp-Dotnet/PayPalHttp-Dotnet.csproj"
 
 # Custom validations
 def test
-  CommandProcessor.command("dotnet test BraintreeHttp-Dotnet.Tests", live_output=true)
+  CommandProcessor.command("dotnet test PayPalHttp-Dotnet.Tests", live_output=true)
 end
 
 def package_version
@@ -49,7 +49,7 @@ def clean
 end
 
 def build_method
-  CommandProcessor.command("dotnet pack -c Release BraintreeHttp-Dotnet")
+  CommandProcessor.command("dotnet pack -c Release PayPalHttp-Dotnet")
 end
 
 configatron.build_method = method(:build_method)
@@ -68,7 +68,7 @@ end
 configatron.update_version_method = method(:update_version_method)
 
 def publish_to_package_manager(version)
-  nupkg = "BraintreeHttp-Dotnet/bin/Release/BraintreeHttp-Dotnet.#{version}.nupkg"
+  nupkg = "PayPalHttp-Dotnet/bin/Release/PayPalHttp-Dotnet.#{version}.nupkg"
   CommandProcessor.command("nuget push #{nupkg} -Source https://api.nuget.org/v3/index.json")
 end
 

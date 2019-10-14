@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Net;
 using System.Net.Http.Headers;
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class HttpException: IOException
     {
