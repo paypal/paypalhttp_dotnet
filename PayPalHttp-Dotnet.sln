@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraintreeHttp-Dotnet", "BraintreeHttp-Dotnet\BraintreeHttp-Dotnet.csproj", "{721A137C-849F-4F38-8469-313FBDACA8A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayPalHttp-Dotnet.Tests", "PayPalHttp-Dotnet.Tests\PayPalHttp-Dotnet.Tests.csproj", "{721A137C-849F-4F38-8469-313FBDACA8A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BraintreeHttp-Dotnet.Tests", "BraintreeHttp-Dotnet.Tests\BraintreeHttp-Dotnet.Tests.csproj", "{84E2B926-5A3B-4F95-9B63-291E0240C1B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayPalHttp-Dotnet", "PayPalHttp-Dotnet\PayPalHttp-Dotnet.csproj", "{84E2B926-5A3B-4F95-9B63-291E0240C1B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

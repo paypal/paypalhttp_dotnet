@@ -1,12 +1,12 @@
-## Braintree HttpClient
+## PayPal HttpClient
 
-BraintreeHttp is a generic HTTP Client used with [generated server SDKs](https://github.braintreeps.com/dx/sdkgen).
+PayPalHttp is a generic HTTP Client used with [generated server SDKs](https://github.braintreeps.com/dx/sdkgen).
 
-In it's simplest form, an [`HttpClient`](./BraintreeHttp-Dotnet/HttpClient.cs) exposes an `Execute` method which takes an [HTTP request](./BraintreeHttp-Dotnet/HttpRequest.cs), executes it against the domain described in an [Environment](./BraintreeHttp-Dotnet/Environment.cs), and returns an [HTTP response](./BraintreeHttp-Dotnet/HttpResponse.cs).
+In it's simplest form, an [`HttpClient`](./PayPalHttp-Dotnet/HttpClient.cs) exposes an `Execute` method which takes an [HTTP request](./PayPalHttp-Dotnet/HttpRequest.cs), executes it against the domain described in an [Environment](./PayPalHttp-Dotnet/Environment.cs), and returns an [HTTP response](./PayPalHttp-Dotnet/HttpResponse.cs).
 
 ### Environment
 
-An [`Environment`](./BraintreeHttp-Dotnet/Environment.cs) describes a domain that hosts a REST API, against which an `HttpClient` will make requests. `Environment` is a simple interface that wraps one method, `BaseUrl`.
+An [`Environment`](./PayPalHttp-Dotnet/Environment.cs) describes a domain that hosts a REST API, against which an `HttpClient` will make requests. `Environment` is a simple interface that wraps one method, `BaseUrl`.
 
 ```C#
 var env = new Environment('https://example.com')
@@ -57,7 +57,7 @@ client.AddInjector(logInjector);
 
 ### Error Handling
 
-`HttpClient#Execute` may throw an `HttpException` if something went wrong during the course of execution. If the server returned a non-200 response, [HttpException](./BraintreeHttp-Dotnet/HttpException.cs) will be thrown, that will contain a status code and headers you can use for debugging.
+`HttpClient#Execute` may throw an `HttpException` if something went wrong during the course of execution. If the server returned a non-200 response, [HttpException](./PayPalHttp-Dotnet/HttpException.cs) will be thrown, that will contain a status code and headers you can use for debugging.
 
 ```C#
 try
@@ -73,7 +73,7 @@ catch (HttpException ex)
 ```
 
 ## License
-BraintreeHttp-Dotnet is open source and available under the MIT license. See the [LICENSE](./LICENSE) file for more information.
+PayPalHttp-Dotnet is open source and available under the MIT license. See the [LICENSE](./LICENSE) file for more information.
 
 ## Contributing
 Pull requests and issues are welcome. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.

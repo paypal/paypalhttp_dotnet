@@ -6,7 +6,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class MultipartSerializer : ISerializer
     {

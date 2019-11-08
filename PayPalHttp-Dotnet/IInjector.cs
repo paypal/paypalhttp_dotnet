@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
 	public interface IInjector
     {

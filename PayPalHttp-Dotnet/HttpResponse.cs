@@ -2,14 +2,14 @@
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class HttpResponse
     {
         public HttpHeaders Headers          { get; }
     	public HttpStatusCode StatusCode    { get; }
 
-        private object result; 
+        private object result;
 
         public HttpResponse(HttpHeaders headers, HttpStatusCode statusCode, object result)
         {

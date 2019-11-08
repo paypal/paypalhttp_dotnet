@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.IO;
 
-namespace BraintreeHttp
+namespace PayPalHttp
 {
     public class JsonSerializer : ISerializer
     {
