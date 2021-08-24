@@ -207,6 +207,29 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
+        public async void Execute_withData_SerializesDataAccordingToContentTypeCaseInsensitive()
+        {
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingPost()
+                .WithBody("{\"name\":\"paypal\"}")
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+            );
+            var request = new HttpRequest("/", HttpMethod.Post, typeof(void));
+            request.ContentType = "application/JSON";
+            request.Body = new TestData
+            {
+                Name = "paypal"
+            };
+
+            var client = Client();
+
+            var response = await client.Execute(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
         public async void Execute_withReturnData_DeserializesAccordingToContentType()
         {
             server.Given(
@@ -217,6 +240,25 @@ namespace PayPalHttp.Tests
                 .WithBody("{\"name\":\"\"}")
                 .WithBody("{\"name\":\"paypal\"}")
                 .WithHeader("Content-Type", "application/json; charset=utf-8")
+            );
+            var request = new HttpRequest("/", HttpMethod.Get, typeof(TestData));
+
+            var response = await Client().Execute(request);
+
+            Assert.Equal("paypal", response.Result<TestData>().Name);
+        }
+
+        [Fact]
+        public async void Execute_withReturnData_DeserializesAccordingToContentTypeCaseInsensitive()
+        {
+            server.Given(
+                Request.Create().WithPath("/")
+                .UsingGet()
+            ).RespondWith(
+                Response.Create().WithStatusCode(200)
+                .WithBody("{\"name\":\"\"}")
+                .WithBody("{\"name\":\"paypal\"}")
+                .WithHeader("Content-Type", "application/JSON; charset=utf-8")
             );
             var request = new HttpRequest("/", HttpMethod.Get, typeof(TestData));
 
