@@ -66,10 +66,47 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
+        public async void SerializeRequest_withJsonContentTypeAsyncCaseInsensitive()
+        {
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "application/JSON";
+            request.Body = new TestData
+            {
+                Name = "paypal"
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+            Assert.StartsWith("application/json", content.Headers.ContentType.ToString());
+
+            var jsonString = await content.ReadAsStringAsync();
+
+            Assert.Equal("{\"name\":\"paypal\"}", jsonString);
+        }
+
+        [Fact]
         public void SerializeRequest_withMultipartContentTypeAsync()
         {
             var request = new HttpRequest("/", HttpMethod.Get);
             request.ContentType = "multipart/form-data";
+            request.Body = new Dictionary<string, object>()
+            {
+                {"hello", "world"},
+                {"something", "Else"},
+                {"myfile", File.Open("../../../../README.md", FileMode.Open)}
+            };
+
+            var encoder = new Encoder();
+            var content = encoder.SerializeRequest(request);
+            Assert.StartsWith("multipart/form-data; boundary=", content.Headers.ContentType.ToString());
+            Assert.DoesNotContain("\"", content.Headers.ContentType.ToString());
+        }
+
+        [Fact]
+        public void SerializeRequest_withMultipartContentTypeAsyncCaseInsensitive()
+        {
+            var request = new HttpRequest("/", HttpMethod.Get);
+            request.ContentType = "MULTIPART/form-data";
             request.Body = new Dictionary<string, object>()
             {
                 {"hello", "world"},
@@ -242,9 +279,33 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
+        public void DeserializeResponse_withJsonContentTypeCaseInsensitive()
+        {
+            var responseContent = new StringContent("{\"name\":\"paypal\"}", Encoding.UTF8, "application/JSON");
+
+            var encoder = new Encoder();
+            var content = encoder.DeserializeResponse(responseContent, typeof(TestData));
+
+            Assert.NotNull(content);
+            Assert.Equal("paypal", ((TestData)content).Name);
+        }
+
+        [Fact]
         public void DeserializeResponse_withTextContentType()
         {
             var responseContent = new StringContent("some plain text", Encoding.UTF8, "text/plain");
+
+            var encoder = new Encoder();
+            var content = encoder.DeserializeResponse(responseContent, typeof(String));
+
+            Assert.NotNull(content);
+            Assert.Equal("some plain text", content);
+        }
+
+        [Fact]
+        public void DeserializeResponse_withTextContentTypeCaseInsensitive()
+        {
+            var responseContent = new StringContent("some plain text", Encoding.UTF8, "text/PLAIN");
 
             var encoder = new Encoder();
             var content = encoder.DeserializeResponse(responseContent, typeof(String));

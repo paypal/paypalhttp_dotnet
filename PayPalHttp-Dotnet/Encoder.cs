@@ -38,6 +38,9 @@ namespace PayPalHttp
             {
                 throw new IOException("HttpRequest did not have content-type header set");
             }
+
+            request.ContentType = request.ContentType.ToLower();
+            
             ISerializer serializer = GetSerializer(request.ContentType);
             if (serializer == null)
             {
@@ -62,6 +65,7 @@ namespace PayPalHttp
                 throw new IOException("HTTP response did not have content-type header set");
             }
             var contentType = content.Headers.ContentType.ToString();
+            contentType = contentType.ToLower();
             ISerializer serializer = GetSerializer(contentType);
             if (serializer == null)
             {
