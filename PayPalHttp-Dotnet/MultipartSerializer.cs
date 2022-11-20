@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PayPalHttp
 {
@@ -14,7 +15,7 @@ namespace PayPalHttp
         private const string RegExPattern = "^multipart/.*$";
         private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
 
-        public object Decode(HttpContent content, Type responseType)
+        public Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
             throw new IOException($"Unable to deserialize Content-Type: multipart/form-data.");
         }
@@ -38,7 +39,7 @@ namespace PayPalHttp
             }
         }
 
-        public HttpContent Encode(HttpRequest request)
+        public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
             if (!(request.Body is IDictionary))
             {
@@ -56,7 +57,7 @@ namespace PayPalHttp
                     var file = (FileStream)item.Value;
                     try {
                         MemoryStream memoryStream = new MemoryStream();
-                        file.CopyTo(memoryStream);
+                        await file.CopyToAsync(memoryStream);
                         var fileContent = new ByteArrayContent(memoryStream.ToArray());
                         var fileName = Path.GetFileName(file.Name);
                         // This is necessary to quote values since the web server is picky; .NET normally does not quote

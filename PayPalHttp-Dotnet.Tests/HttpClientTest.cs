@@ -286,7 +286,7 @@ namespace PayPalHttp.Tests
             await client.Execute(request);
         }
 
-        private WireMock.Logging.LogEntry GetLastRequest()
+        private WireMock.Logging.ILogEntry GetLastRequest()
         {
             foreach (var log in server.LogEntries)
             {

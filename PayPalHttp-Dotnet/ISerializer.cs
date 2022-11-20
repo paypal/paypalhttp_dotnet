@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PayPalHttp
 {
@@ -9,7 +10,7 @@ namespace PayPalHttp
     {
         string GetContentTypeRegexPattern();
         Regex GetContentRegEx();
-        HttpContent Encode(HttpRequest request);
-        object Decode(HttpContent content, Type responseType);
+        Task<HttpContent> EncodeAsync(HttpRequest request);
+        Task<object> DecodeAsync(HttpContent content, Type responseType);
     }
 }

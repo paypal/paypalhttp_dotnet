@@ -58,7 +58,7 @@ namespace PayPalHttp
                 throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
-            var content = serializer.Encode(request);
+            var content = await serializer.EncodeAsync(request);
 
             if ("gzip".Equals(request.ContentEncoding))
             {
@@ -91,7 +91,7 @@ namespace PayPalHttp
                 content = new StringContent(await GunzipAsync(buf), Encoding.UTF8);
             }
 
-            return serializer.Decode(content, responseType);
+            return await serializer.DecodeAsync(content, responseType);
         }
 
         private ISerializer GetSerializer(string contentType)

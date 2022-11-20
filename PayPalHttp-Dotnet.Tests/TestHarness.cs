@@ -25,11 +25,11 @@ namespace PayPalHttp.Tests
 
     public class TestHarness: IDisposable
     {
-        protected FluentMockServer server;
+        protected WireMockServer server;
 
 		public TestHarness()
         {
-			server = FluentMockServer.Start();
+			server = WireMockServer.Start();
     	}
 
     	public void Dispose()
