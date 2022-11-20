@@ -13,23 +13,34 @@ namespace PayPalHttp
 {
     public class Encoder
     {
-        private List<ISerializer> serializers;
+        private static readonly Dictionary<string, ISerializer> DefaultSerializers = new Dictionary<string, ISerializer>();
+
+        private readonly Dictionary<string, ISerializer> _serializerLookup;
+
+        static Encoder()
+        {
+            RegisterSerializer(new JsonSerializer(), DefaultSerializers);
+            RegisterSerializer(new TextSerializer(), DefaultSerializers);
+            RegisterSerializer(new MultipartSerializer(), DefaultSerializers);
+            RegisterSerializer(new FormEncodedSerializer(), DefaultSerializers);
+        }
 
         public Encoder()
         {
-            serializers = new List<ISerializer>();
-            RegisterSerializer(new JsonSerializer());
-            RegisterSerializer(new TextSerializer());
-            RegisterSerializer(new MultipartSerializer());
-            RegisterSerializer(new FormEncodedSerializer());
+            _serializerLookup = new Dictionary<string, ISerializer>(DefaultSerializers);
+        }
+
+        private static void RegisterSerializer(ISerializer serializer, Dictionary<string, ISerializer> serializerLookup)
+        {
+            if (serializer != null)
+            {
+                serializerLookup[serializer.GetContentTypeRegexPattern()] = serializer;
+            }
         }
 
         public void RegisterSerializer(ISerializer serializer)
         {
-            if (serializer != null)
-            {
-                serializers.Add(serializer);
-            }
+            RegisterSerializer(serializer, _serializerLookup);
         }
 
         public HttpContent SerializeRequest(HttpRequest request)
@@ -85,27 +96,12 @@ namespace PayPalHttp
 
         private ISerializer GetSerializer(string contentType)
         {
-            foreach (var serializer in serializers)
-            {
-                Regex pattern = new Regex(serializer.GetContentTypeRegexPattern());
-                if (pattern.Match(contentType).Success)
-                {
-                    return serializer;
-                }
-            }
-
-            return null;
+            return _serializerLookup.Values.FirstOrDefault(f => f.GetContentRegEx().Match(contentType).Success);
         }
 
         private string GetSupportedContentTypes()
         {
-            List<string> contentTypes = new List<string>();
-            foreach (var serializer in this.serializers)
-            {
-                contentTypes.Add(serializer.GetContentTypeRegexPattern());
-            }
-
-            return String.Join(", ", contentTypes);
+            return String.Join(", ", _serializerLookup.Keys);
         }
 
         private static byte[] Gzip(string source)

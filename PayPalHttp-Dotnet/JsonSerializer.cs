@@ -2,15 +2,14 @@
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace PayPalHttp
 {
     public class JsonSerializer : ISerializer
     {
-        public string GetContentTypeRegexPattern()
-        {
-            return "application/json";
-        }
+        private const string RegExPattern = "application/json";
+        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
 
         public object Decode(HttpContent content, Type responseType)
         {
@@ -33,9 +32,19 @@ namespace PayPalHttp
                 ms.Position = 0;
                 using (var sr = new StreamReader(ms))
                 {
-                    return new StringContent(sr.ReadToEnd(), System.Text.Encoding.UTF8, "application/json");
+                    return new StringContent(sr.ReadToEnd(), System.Text.Encoding.UTF8, RegExPattern);
                 }
             }
+        }
+
+        public Regex GetContentRegEx()
+        {
+            return _pattern;
+        }
+
+        public string GetContentTypeRegexPattern()
+        {
+            return RegExPattern;
         }
     }
 }

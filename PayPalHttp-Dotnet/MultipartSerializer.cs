@@ -5,19 +5,18 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace PayPalHttp
 {
     public class MultipartSerializer : ISerializer
     {
-        public string GetContentTypeRegexPattern()
-        {
-            return "^multipart/.*$";
-        }
+        private const string RegExPattern = "^multipart/.*$";
+        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
 
         public object Decode(HttpContent content, Type responseType)
         {
-            throw new IOException("Unable to deserialize Content-Type: multipart/form-data.");
+            throw new IOException($"Unable to deserialize Content-Type: multipart/form-data.");
         }
 
         private string GetMimeMapping(string filename)
@@ -84,6 +83,16 @@ namespace PayPalHttp
             form.Headers.Remove("Content-Type");
             form.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary);
             return form;
+        }
+
+        public Regex GetContentRegEx()
+        {
+            return _pattern;
+        }
+
+        public string GetContentTypeRegexPattern()
+        {
+            return RegExPattern;
         }
     }
 }
