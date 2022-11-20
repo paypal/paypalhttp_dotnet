@@ -54,7 +54,7 @@ namespace PayPalHttp
 
             if (request.Body != null)
             {
-                request.Content = Encoder.SerializeRequest(request);
+                request.Content = await Encoder.SerializeRequestAsync(request);
             }
 
 			var response = await client.SendAsync(request);
@@ -64,7 +64,7 @@ namespace PayPalHttp
                 object responseBody = null;
                 if (response.Content.Headers.ContentType != null)
                 {
-                    responseBody = Encoder.DeserializeResponse(response.Content, request.ResponseType);
+                    responseBody = await Encoder.DeserializeResponseAsync(response.Content, request.ResponseType);
                 }
                 return new HttpResponse(response.Headers, response.StatusCode, responseBody);
             }

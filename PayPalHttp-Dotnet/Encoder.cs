@@ -43,7 +43,7 @@ namespace PayPalHttp
             RegisterSerializer(serializer, _serializerLookup);
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public async Task<HttpContent> SerializeRequestAsync(HttpRequest request)
         {
             if (request.ContentType == null)
             {
@@ -62,14 +62,14 @@ namespace PayPalHttp
 
             if ("gzip".Equals(request.ContentEncoding))
             {
-                var source = content.ReadAsStringAsync().Result;
-                content = new ByteArrayContent(Gzip(source));
+                var source = await content.ReadAsStringAsync();
+                content = new ByteArrayContent(await GzipAsync(source));
             }
 
             return content;
         }
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public async Task<object> DeserializeResponseAsync(HttpContent content, Type responseType)
         {
             if (content.Headers.ContentType == null)
             {
@@ -87,8 +87,8 @@ namespace PayPalHttp
 
             if ("gzip".Equals(contentEncoding))
             {
-                var buf = content.ReadAsByteArrayAsync().Result;
-                content = new StringContent(Gunzip(buf), Encoding.UTF8);
+                var buf = await content.ReadAsByteArrayAsync();
+                content = new StringContent(await GunzipAsync(buf), Encoding.UTF8);
             }
 
             return serializer.Decode(content, responseType);
@@ -104,45 +104,30 @@ namespace PayPalHttp
             return String.Join(", ", _serializerLookup.Keys);
         }
 
-        private static byte[] Gzip(string source)
+        private static async Task<byte[]> GzipAsync(string source)
         {
             var bytes = Encoding.UTF8.GetBytes(source);
 
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream())
+            using var msi = new MemoryStream(bytes);
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(mso, CompressionMode.Compress))
             {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    msi.CopyTo(gs);
-                }
-
-                return mso.ToArray();
+                await msi.CopyToAsync(gs);
             }
+
+            return mso.ToArray();
         }
 
-        private static string Gunzip(byte[] source)
+        private static async Task<string> GunzipAsync(byte[] source)
         {
-            using (var msi = new MemoryStream(source))
             using (var mso = new MemoryStream())
             {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                using (var gs = new GZipStream(new MemoryStream(source), CompressionMode.Decompress))
                 {
-                    CopyTo(gs, mso);
+                    await gs.CopyToAsync(mso);
                 }
 
                 return Encoding.UTF8.GetString(mso.ToArray());
-            }
-        }
-
-        private static void CopyTo(Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[4096];
-
-            int cnt;
-
-            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                dest.Write(bytes, 0, cnt);
             }
         }
     }

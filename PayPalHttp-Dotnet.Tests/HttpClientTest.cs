@@ -10,6 +10,7 @@ using WireMock.ResponseBuilders;
 using WireMock.Matchers;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace PayPalHttp.Tests
 {
@@ -36,7 +37,7 @@ namespace PayPalHttp.Tests
     public class HttpClientTest : TestHarness
     {
         [Fact]
-        public async void Execute_throwsExceptionForNonSuccessfulStatusCodes()
+        public async Task Execute_throwsExceptionForNonSuccessfulStatusCodes()
         {
             server.Given(
                 Request.Create().WithPath("/").UsingGet()
@@ -59,7 +60,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_returnsSuccessForSuccessfulStatusCodes()
+        public async Task Execute_returnsSuccessForSuccessfulStatusCodes()
         {
             server.Given(
                 Request.Create().WithPath("/").UsingGet()
@@ -74,7 +75,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_setsVerbFromRequest()
+        public async Task Execute_setsVerbFromRequest()
         {
             server.Given(
                 Request.Create().WithPath("/").UsingDelete()
@@ -90,7 +91,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_UsesDefaultUserAgentHeader()
+        public async Task Execute_UsesDefaultUserAgentHeader()
         {
             server.Given(
                 Request.Create().WithPath("/").UsingGet()
@@ -105,7 +106,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_writesDataFromRequestIfPresent()
+        public async Task Execute_writesDataFromRequestIfPresent()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -124,7 +125,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_doesNotWriteDataFromRequestIfNotPresent()
+        public async Task Execute_doesNotWriteDataFromRequestIfNotPresent()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -142,7 +143,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_doesNotMutateOriginalRequest()
+        public async Task Execute_doesNotMutateOriginalRequest()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -165,7 +166,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void AddInjector_usesCustomInjectorsToModifyRequest()
+        public async Task AddInjector_usesCustomInjectorsToModifyRequest()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -184,7 +185,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_withData_SerializesDataAccordingToContentType()
+        public async Task Execute_withData_SerializesDataAccordingToContentType()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -207,7 +208,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_withData_SerializesDataAccordingToContentTypeCaseInsensitive()
+        public async Task Execute_withData_SerializesDataAccordingToContentTypeCaseInsensitive()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -230,7 +231,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_withReturnData_DeserializesAccordingToContentType()
+        public async Task Execute_withReturnData_DeserializesAccordingToContentType()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -249,7 +250,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void Execute_withReturnData_DeserializesAccordingToContentTypeCaseInsensitive()
+        public async Task Execute_withReturnData_DeserializesAccordingToContentTypeCaseInsensitive()
         {
             server.Given(
                 Request.Create().WithPath("/")
@@ -268,7 +269,7 @@ namespace PayPalHttp.Tests
         }
 
         [Fact]
-        public async void AddInjector_withNull_doesNotThrow()
+        public async Task AddInjector_withNull_doesNotThrow()
         {
             server.Given(
                 Request.Create().WithPath("/")
