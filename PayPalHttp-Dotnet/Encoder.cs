@@ -13,26 +13,37 @@ namespace PayPalHttp
 {
     public class Encoder
     {
-        private List<ISerializer> serializers;
+        private static readonly Dictionary<string, ISerializer> DefaultSerializers = new Dictionary<string, ISerializer>();
+
+        private readonly Dictionary<string, ISerializer> _serializerLookup;
+
+        static Encoder()
+        {
+            RegisterSerializer(new JsonSerializer(), DefaultSerializers);
+            RegisterSerializer(new TextSerializer(), DefaultSerializers);
+            RegisterSerializer(new MultipartSerializer(), DefaultSerializers);
+            RegisterSerializer(new FormEncodedSerializer(), DefaultSerializers);
+        }
 
         public Encoder()
         {
-            serializers = new List<ISerializer>();
-            RegisterSerializer(new JsonSerializer());
-            RegisterSerializer(new TextSerializer());
-            RegisterSerializer(new MultipartSerializer());
-            RegisterSerializer(new FormEncodedSerializer());
+            _serializerLookup = new Dictionary<string, ISerializer>(DefaultSerializers);
+        }
+
+        private static void RegisterSerializer(ISerializer serializer, Dictionary<string, ISerializer> serializerLookup)
+        {
+            if (serializer != null)
+            {
+                serializerLookup[serializer.GetContentTypeRegexPattern()] = serializer;
+            }
         }
 
         public void RegisterSerializer(ISerializer serializer)
         {
-            if (serializer != null)
-            {
-                serializers.Add(serializer);
-            }
+            RegisterSerializer(serializer, _serializerLookup);
         }
 
-        public HttpContent SerializeRequest(HttpRequest request)
+        public async Task<HttpContent> SerializeRequestAsync(HttpRequest request)
         {
             if (request.ContentType == null)
             {
@@ -47,18 +58,18 @@ namespace PayPalHttp
                 throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             }
 
-            var content = serializer.Encode(request);
+            var content = await serializer.EncodeAsync(request);
 
             if ("gzip".Equals(request.ContentEncoding))
             {
-                var source = content.ReadAsStringAsync().Result;
-                content = new ByteArrayContent(Gzip(source));
+                var source = await content.ReadAsStringAsync();
+                content = new ByteArrayContent(await GzipAsync(source));
             }
 
             return content;
         }
 
-        public object DeserializeResponse(HttpContent content, Type responseType)
+        public async Task<object> DeserializeResponseAsync(HttpContent content, Type responseType)
         {
             if (content.Headers.ContentType == null)
             {
@@ -76,77 +87,47 @@ namespace PayPalHttp
 
             if ("gzip".Equals(contentEncoding))
             {
-                var buf = content.ReadAsByteArrayAsync().Result;
-                content = new StringContent(Gunzip(buf), Encoding.UTF8);
+                var buf = await content.ReadAsByteArrayAsync();
+                content = new StringContent(await GunzipAsync(buf), Encoding.UTF8);
             }
 
-            return serializer.Decode(content, responseType);
+            return await serializer.DecodeAsync(content, responseType);
         }
 
         private ISerializer GetSerializer(string contentType)
         {
-            foreach (var serializer in serializers)
-            {
-                Regex pattern = new Regex(serializer.GetContentTypeRegexPattern());
-                if (pattern.Match(contentType).Success)
-                {
-                    return serializer;
-                }
-            }
-
-            return null;
+            return _serializerLookup.Values.FirstOrDefault(f => f.GetContentRegEx().Match(contentType).Success);
         }
 
         private string GetSupportedContentTypes()
         {
-            List<string> contentTypes = new List<string>();
-            foreach (var serializer in this.serializers)
-            {
-                contentTypes.Add(serializer.GetContentTypeRegexPattern());
-            }
-
-            return String.Join(", ", contentTypes);
+            return String.Join(", ", _serializerLookup.Keys);
         }
 
-        private static byte[] Gzip(string source)
+        private static async Task<byte[]> GzipAsync(string source)
         {
             var bytes = Encoding.UTF8.GetBytes(source);
 
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream())
+            using var msi = new MemoryStream(bytes);
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(mso, CompressionMode.Compress))
             {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    msi.CopyTo(gs);
-                }
-
-                return mso.ToArray();
+                await msi.CopyToAsync(gs);
             }
+
+            return mso.ToArray();
         }
 
-        private static string Gunzip(byte[] source)
+        private static async Task<string> GunzipAsync(byte[] source)
         {
-            using (var msi = new MemoryStream(source))
             using (var mso = new MemoryStream())
             {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                using (var gs = new GZipStream(new MemoryStream(source), CompressionMode.Decompress))
                 {
-                    CopyTo(gs, mso);
+                    await gs.CopyToAsync(mso);
                 }
 
                 return Encoding.UTF8.GetString(mso.ToArray());
-            }
-        }
-
-        private static void CopyTo(Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[4096];
-
-            int cnt;
-
-            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                dest.Write(bytes, 0, cnt);
             }
         }
     }

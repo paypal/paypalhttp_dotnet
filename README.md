@@ -1,3 +1,7 @@
+## ElCamino.PayPalHttp
+
+Improved regex and threading performance and current .NET frameworks over deprecated/forked [PayPalHttp library](https://github.com/paypal/paypalhttp_dotnet).
+
 ## PayPal HttpClient
 
 PayPalHttp is a generic HTTP Client used with [generated server SDKs](https://github.braintreeps.com/dx/sdkgen).

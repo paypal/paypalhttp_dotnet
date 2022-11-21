@@ -1,24 +1,41 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayPalHttp-Dotnet.Tests", "PayPalHttp-Dotnet.Tests\PayPalHttp-Dotnet.Tests.csproj", "{721A137C-849F-4F38-8469-313FBDACA8A1}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PayPalHttp-Dotnet.Tests", "PayPalHttp-Dotnet.Tests\PayPalHttp-Dotnet.Tests.csproj", "{721A137C-849F-4F38-8469-313FBDACA8A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayPalHttp-Dotnet", "PayPalHttp-Dotnet\PayPalHttp-Dotnet.csproj", "{84E2B926-5A3B-4F95-9B63-291E0240C1B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PayPalHttp-Dotnet", "PayPalHttp-Dotnet\PayPalHttp-Dotnet.csproj", "{84E2B926-5A3B-4F95-9B63-291E0240C1B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E15695B2-2468-4826-B7C6-7FD26909B473}"
+	ProjectSection(SolutionItems) = preProject
+		..\identityazuretable\.editorconfig = ..\identityazuretable\.editorconfig
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|x64.Build.0 = Debug|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Debug|x86.Build.0 = Debug|Any CPU
 		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|x64.ActiveCfg = Release|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|x64.Build.0 = Release|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|x86.ActiveCfg = Release|Any CPU
+		{721A137C-849F-4F38-8469-313FBDACA8A1}.Release|x86.Build.0 = Release|Any CPU
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Debug|x64.ActiveCfg = Debug|x64
@@ -31,5 +48,11 @@ Global
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Release|x64.Build.0 = Release|x64
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Release|x86.ActiveCfg = Release|x86
 		{84E2B926-5A3B-4F95-9B63-291E0240C1B4}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A522D1EE-4E5C-4029-836F-2B7DF2026BE7}
 	EndGlobalSection
 EndGlobal

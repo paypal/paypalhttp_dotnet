@@ -2,28 +2,26 @@
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PayPalHttp
 {
     public class JsonSerializer : ISerializer
     {
-        public string GetContentTypeRegexPattern()
-        {
-            return "application/json";
-        }
+        private const string RegExPattern = "application/json";
+        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
 
-        public object Decode(HttpContent content, Type responseType)
+        public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
-            var jsonSerializer = new DataContractJsonSerializer(responseType);
-            var jsonString = content.ReadAsStringAsync().Result;
-
-            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonString)))
+            var jsonSerializer = new DataContractJsonSerializer(responseType);            
+            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync())))
             {
                 return jsonSerializer.ReadObject(ms);
             }
         }
 
-        public HttpContent Encode(HttpRequest request)
+        public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
             var jsonSerializer = new DataContractJsonSerializer(request.Body.GetType());
 
@@ -33,9 +31,19 @@ namespace PayPalHttp
                 ms.Position = 0;
                 using (var sr = new StreamReader(ms))
                 {
-                    return new StringContent(sr.ReadToEnd(), System.Text.Encoding.UTF8, "application/json");
+                    return new StringContent(await sr.ReadToEndAsync(), System.Text.Encoding.UTF8, RegExPattern);
                 }
             }
+        }
+
+        public Regex GetContentRegEx()
+        {
+            return _pattern;
+        }
+
+        public string GetContentTypeRegexPattern()
+        {
+            return RegExPattern;
         }
     }
 }

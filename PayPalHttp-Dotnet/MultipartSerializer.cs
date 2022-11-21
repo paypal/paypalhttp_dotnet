@@ -5,19 +5,19 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PayPalHttp
 {
     public class MultipartSerializer : ISerializer
     {
-        public string GetContentTypeRegexPattern()
-        {
-            return "^multipart/.*$";
-        }
+        private const string RegExPattern = "^multipart/.*$";
+        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
 
-        public object Decode(HttpContent content, Type responseType)
+        public Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
-            throw new IOException("Unable to deserialize Content-Type: multipart/form-data.");
+            throw new IOException($"Unable to deserialize Content-Type: multipart/form-data.");
         }
 
         private string GetMimeMapping(string filename)
@@ -39,7 +39,7 @@ namespace PayPalHttp
             }
         }
 
-        public HttpContent Encode(HttpRequest request)
+        public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
             if (!(request.Body is IDictionary))
             {
@@ -57,7 +57,7 @@ namespace PayPalHttp
                     var file = (FileStream)item.Value;
                     try {
                         MemoryStream memoryStream = new MemoryStream();
-                        file.CopyTo(memoryStream);
+                        await file.CopyToAsync(memoryStream);
                         var fileContent = new ByteArrayContent(memoryStream.ToArray());
                         var fileName = Path.GetFileName(file.Name);
                         // This is necessary to quote values since the web server is picky; .NET normally does not quote
@@ -84,6 +84,16 @@ namespace PayPalHttp
             form.Headers.Remove("Content-Type");
             form.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary);
             return form;
+        }
+
+        public Regex GetContentRegEx()
+        {
+            return _pattern;
+        }
+
+        public string GetContentTypeRegexPattern()
+        {
+            return RegExPattern;
         }
     }
 }
