@@ -1,13 +1,44 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
 	<LangVersion>10.0</LangVersion>
     <Title>ElCamino.PayPalHttp</Title>
-    <Version>1.7.0</Version>
-    <Copyright>Copyright PayPal, Inc. 2019 / David Melendez 2022</Copyright>
-    <Description>PayPalHttp is a generic http client designed to be used with code-generated projects.</Description>
-    <Authors>PayPal</Authors>
-    <PackageReleaseNotes>First Release</PackageReleaseNotes>
+	<AssemblyName>ElCamino.PayPalHttp</AssemblyName>
+	  
+	<PackageId>ElCamino.PayPalHttp</PackageId>
+	<PackageTags>ElCamino;ASP.NET;Paypal;PaypalHttp;Paypal .NET SDK</PackageTags>
+	<PackageReleaseNotes>
+		Improved regex and threading performance over deprecated PayPalHttp library. Check https://github.com/dlmelendez/paypalhttp_dotnet/releases for latest release information.
+	</PackageReleaseNotes>
+	<PackageIcon>projectNugetPic.png</PackageIcon>
+	<PackageLicenseUrl></PackageLicenseUrl>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>git</RepositoryType>
+	<RepositoryUrl>https://github.com/dlmelendez/paypalhttp_dotnet.git</RepositoryUrl>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+	<Version>1.7.0</Version>
+	  <PackageProjectUrl>https://github.com/dlmelendez/paypalhttp_dotnet</PackageProjectUrl>
+	  <!--<DebugType>Full</DebugType>-->
+	  <!-- DebugType Full is needed for test code coverage, but .nuget symbols doesn't like it-->
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <NeutralLanguage>en-US</NeutralLanguage>
+
+	  <Copyright>Copyright PayPal, Inc. 2019 / Copyright ©  2022 David Melendez, MIT License</Copyright>
+    <Description>Improved regex and threading performance over deprecated PayPalHttp library. PayPalHttp is a generic http client designed to be used with code-generated projects.</Description>
+    <Authors>PayPal, David Melendez</Authors>
+    <PackageReleaseNotes>Release based on PayPalHttp library.</PackageReleaseNotes>
   </PropertyGroup>
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="projectNugetPic.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
 </Project>

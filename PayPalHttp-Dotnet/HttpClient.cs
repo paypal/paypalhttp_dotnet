@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -6,24 +7,47 @@ using System.Threading.Tasks;
 namespace PayPalHttp
 {
     public class HttpClient
-    {
-        public Encoder Encoder { get; }
+    {               
+        private readonly System.Net.Http.HttpClient _client;
+        private readonly List<IInjector> _injectors = new List<IInjector>();
+        protected TimeSpan _timeout = TimeSpan.FromMinutes(5); //5 minute http pool default timeout
+        protected readonly Environment _environment;
 
-        protected Environment environment;
-        private System.Net.Http.HttpClient client;
-        private List<IInjector> injectors;
+        private static ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
+
+        public Encoder Encoder { get; private set; }
+
 
         public HttpClient(Environment environment)
         {
-            this.environment = environment;
-            this.injectors = new List<IInjector>();
-            this.Encoder = new Encoder();
-
-            client = new System.Net.Http.HttpClient();
-            client.BaseAddress = new Uri(environment.BaseUrl());
-            client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
+            _environment = environment;
+            Encoder = new Encoder();
+#if NET6_0_OR_GREATER
+            _client = GetHttpClient(environment.BaseUrl());
+#else
+            _client = new System.Net.Http.HttpClient();
+            _client.BaseAddress = new Uri(environment.BaseUrl());
+            _client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
+#endif
         }
 
+#if NET6_0_OR_GREATER
+        protected virtual SocketsHttpHandler GetHttpSocketHandler()
+        {
+            return new SocketsHttpHandler() {  PooledConnectionLifetime = _timeout };
+        }
+
+        protected virtual System.Net.Http.HttpClient GetHttpClient(string baseUrl)
+        {
+            return ClientDictionary.GetOrAdd(baseUrl.ToLower(), (bUrl) => {
+                var client = new System.Net.Http.HttpClient(GetHttpSocketHandler());
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
+
+                return client;
+            });
+        }
+#endif
         protected virtual string GetUserAgent()
         {
             return "PayPalHttp-Dotnet HTTP/1.1";
@@ -33,31 +57,31 @@ namespace PayPalHttp
         {
             if (injector != null)
             {
-                this.injectors.Add(injector);
+                this._injectors.Add(injector);
             }
         }
 
         public void SetConnectTimeout(TimeSpan timeout)
         {
-            client.Timeout = timeout;
+            _client.Timeout = _timeout = timeout;
         }
 
         public virtual async Task<HttpResponse> Execute<T>(T req) where T: HttpRequest
         {
             var request = req.Clone<T>();
 
-            foreach (var injector in injectors) {
+            foreach (var injector in _injectors) {
                 injector.Inject(request);
             }
 
-            request.RequestUri = new Uri(this.environment.BaseUrl() + request.Path);
+            request.RequestUri = new Uri(this._environment.BaseUrl() + request.Path);
 
             if (request.Body != null)
             {
                 request.Content = await Encoder.SerializeRequestAsync(request);
             }
 
-			var response = await client.SendAsync(request);
+			var response = await _client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {

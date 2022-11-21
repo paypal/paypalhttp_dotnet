@@ -14,7 +14,7 @@ namespace PayPalHttp
 
         public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
-            var jsonSerializer = new DataContractJsonSerializer(responseType);
+            var jsonSerializer = new DataContractJsonSerializer(responseType);            
             using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync())))
             {
                 return jsonSerializer.ReadObject(ms);
