@@ -1,6 +1,6 @@
 ## ElCamino.PayPalHttp
 
-Improved regex and threading performance over deprecated/forked [PayPalHttp library](https://github.com/paypal/paypalhttp_dotnet).
+Improved regex and threading performance and current .NET frameworks over deprecated/forked [PayPalHttp library](https://github.com/paypal/paypalhttp_dotnet).
 
 ## PayPal HttpClient
 
