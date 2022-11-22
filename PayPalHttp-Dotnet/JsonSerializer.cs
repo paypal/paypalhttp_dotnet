@@ -10,7 +10,7 @@ namespace PayPalHttp
     public class JsonSerializer : ISerializer
     {
         private const string RegExPattern = "application/json";
-        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
+        private static readonly Regex _pattern = new(RegExPattern, RegexOptions.Compiled);
 
         public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {

@@ -8,7 +8,7 @@ namespace PayPalHttp
     public class TextSerializer : ISerializer
     {
         private const string RegExPattern = "^text/.*$";
-        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
+        private static readonly Regex _pattern = new(RegExPattern, RegexOptions.Compiled);
 
         public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {

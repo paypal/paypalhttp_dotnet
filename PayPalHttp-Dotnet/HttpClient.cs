@@ -9,11 +9,11 @@ namespace PayPalHttp
     public class HttpClient
     {               
         private readonly System.Net.Http.HttpClient _client;
-        private readonly List<IInjector> _injectors = new List<IInjector>();
+        private readonly List<IInjector> _injectors = new();
         protected TimeSpan _timeout = TimeSpan.FromMinutes(5); //5 minute http pool default timeout
         protected readonly Environment _environment;
 
-        private static ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
+        private static readonly ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
 
         public Encoder Encoder { get; private set; }
 
@@ -40,8 +40,10 @@ namespace PayPalHttp
         protected virtual System.Net.Http.HttpClient GetHttpClient(string baseUrl)
         {
             return ClientDictionary.GetOrAdd(baseUrl.ToLower(), (bUrl) => {
-                var client = new System.Net.Http.HttpClient(GetHttpSocketHandler());
-                client.BaseAddress = new Uri(baseUrl);
+                var client = new System.Net.Http.HttpClient(GetHttpSocketHandler())
+                {
+                    BaseAddress = new Uri(baseUrl)
+                };
                 client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
 
                 return client;
@@ -57,7 +59,7 @@ namespace PayPalHttp
         {
             if (injector != null)
             {
-                this._injectors.Add(injector);
+                _injectors.Add(injector);
             }
         }
 
@@ -71,10 +73,10 @@ namespace PayPalHttp
             var request = req.Clone<T>();
 
             foreach (var injector in _injectors) {
-                injector.Inject(request);
+                request = await injector.InjectAsync(request);
             }
 
-            request.RequestUri = new Uri(this._environment.BaseUrl() + request.Path);
+            request.RequestUri = new Uri(_environment.BaseUrl() + request.Path);
 
             if (request.Body != null)
             {

@@ -13,7 +13,7 @@ namespace PayPalHttp
     public class MultipartSerializer : ISerializer
     {
         private const string RegExPattern = "^multipart/.*$";
-        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
+        private static readonly Regex _pattern = new(RegExPattern, RegexOptions.Compiled);
 
         public Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
@@ -47,7 +47,7 @@ namespace PayPalHttp
             }
 
             var boundary = "CustomBoundary8d0f01e6b3b5daf";
-            MultipartFormDataContent form = new MultipartFormDataContent(boundary);
+            MultipartFormDataContent form = new(boundary);
             var body = (Dictionary<string, object>)request.Body;
 
             foreach (KeyValuePair<string, object> item in body)
@@ -56,7 +56,7 @@ namespace PayPalHttp
                 {
                     var file = (FileStream)item.Value;
                     try {
-                        MemoryStream memoryStream = new MemoryStream();
+                        MemoryStream memoryStream = new();
                         await file.CopyToAsync(memoryStream);
                         var fileContent = new ByteArrayContent(memoryStream.ToArray());
                         var fileName = Path.GetFileName(file.Name);

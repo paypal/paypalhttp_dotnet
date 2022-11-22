@@ -23,9 +23,10 @@ namespace PayPalHttp.Tests
 
     class TestInjector : IInjector
     {
-        public void Inject(HttpRequest request)
+        public Task<T> InjectAsync<T>(T request) where T : HttpRequest
         {
             request.Headers.Add("User-Agent", "Custom Injector");
+            return Task.FromResult(request);
         }
     }
 

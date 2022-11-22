@@ -9,18 +9,18 @@ namespace PayPalHttp
         public HttpHeaders Headers          { get; }
     	public HttpStatusCode StatusCode    { get; }
 
-        private object result;
+        private readonly object _result;
 
         public HttpResponse(HttpHeaders headers, HttpStatusCode statusCode, object result)
         {
-            this.Headers = headers;
-            this.StatusCode = statusCode;
-            this.result = result;
+            Headers = headers;
+            StatusCode = statusCode;
+            _result = result;
         }
 
         public T Result<T>()
         {
-            return (T)this.result;
+            return (T)_result;
         }
     }
 }

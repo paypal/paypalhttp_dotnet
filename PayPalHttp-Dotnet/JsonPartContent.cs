@@ -11,13 +11,13 @@ namespace PayPalHttp
     public class JsonPartContent : StringContent
     {
         public JsonPartContent(string partName, object json):
-            base(serializeJson(json), System.Text.Encoding.UTF8, "application/json") {
+            base(SerializeJson(json), System.Text.Encoding.UTF8, "application/json") {
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
             // Need to ensure values are quoted
             Headers.Add("Content-Disposition", "form-data; name=\"" + partName + "\"; filename=\"" + partName + ".json\"");
         }
 
-        private static string serializeJson(object json) {
+        private static string SerializeJson(object json) {
             var jsonSerializer = new DataContractJsonSerializer(json.GetType());
 
             using (var ms = new MemoryStream())

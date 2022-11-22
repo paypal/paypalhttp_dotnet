@@ -11,7 +11,7 @@ namespace PayPalHttp
     public class FormEncodedSerializer: ISerializer
     {
         private const string RegExPattern = "application/x-www-form-urlencoded";
-        private static readonly Regex _pattern = new Regex(RegExPattern, RegexOptions.Compiled);
+        private static readonly Regex _pattern = new(RegExPattern, RegexOptions.Compiled);
 
         public Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
