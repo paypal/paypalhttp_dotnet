@@ -20,7 +20,7 @@ namespace PayPalHttp
             throw new IOException($"Unable to deserialize Content-Type: multipart/form-data.");
         }
 
-        private string GetMimeMapping(string filename)
+        private static string GetMimeMapping(string filename)
         {
             switch (Path.GetExtension(filename))
             {
@@ -41,7 +41,7 @@ namespace PayPalHttp
 
         public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
-            if (!(request.Body is IDictionary))
+            if (request.Body is not IDictionary)
             {
                 throw new IOException("Request requestBody must be Map<String, Object> when Content-Type is multipart/*");
             }
@@ -57,12 +57,12 @@ namespace PayPalHttp
                     var file = (FileStream)item.Value;
                     try {
                         MemoryStream memoryStream = new();
-                        await file.CopyToAsync(memoryStream);
+                        await file.CopyToAsync(memoryStream).ConfigureAwait(false);
                         var fileContent = new ByteArrayContent(memoryStream.ToArray());
                         var fileName = Path.GetFileName(file.Name);
                         // This is necessary to quote values since the web server is picky; .NET normally does not quote
                         fileContent.Headers.Add("Content-Disposition", "form-data; name=\"" + (string)item.Key + "\"; filename=\"" + fileName + "\"");
-                        string mimeType = GetMimeMapping(fileName);
+                        string mimeType = MultipartSerializer.GetMimeMapping(fileName);
                         fileContent.Headers.Add("Content-Type", mimeType);
 
                         form.Add(fileContent, (string)item.Key);

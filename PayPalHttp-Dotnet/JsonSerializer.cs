@@ -15,7 +15,7 @@ namespace PayPalHttp
         public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
             var jsonSerializer = new DataContractJsonSerializer(responseType);            
-            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync())))
+            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync().ConfigureAwait(false))))
             {
                 return jsonSerializer.ReadObject(ms);
             }
@@ -31,7 +31,7 @@ namespace PayPalHttp
                 ms.Position = 0;
                 using (var sr = new StreamReader(ms))
                 {
-                    return new StringContent(await sr.ReadToEndAsync(), System.Text.Encoding.UTF8, RegExPattern);
+                    return new StringContent(await sr.ReadToEndAsync().ConfigureAwait(false), System.Text.Encoding.UTF8, RegExPattern);
                 }
             }
         }

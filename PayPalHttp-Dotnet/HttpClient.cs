@@ -73,30 +73,30 @@ namespace PayPalHttp
             var request = req.Clone<T>();
 
             foreach (var injector in _injectors) {
-                request = await injector.InjectAsync(request);
+                request = await injector.InjectAsync(request).ConfigureAwait(false);
             }
 
             request.RequestUri = new Uri(_environment.BaseUrl() + request.Path);
 
             if (request.Body != null)
             {
-                request.Content = await Encoder.SerializeRequestAsync(request);
+                request.Content = await Encoder.SerializeRequestAsync(request).ConfigureAwait(false);
             }
 
-			var response = await _client.SendAsync(request);
+			var response = await _client.SendAsync(request).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
                 object responseBody = null;
                 if (response.Content.Headers.ContentType != null)
                 {
-                    responseBody = await Encoder.DeserializeResponseAsync(response.Content, request.ResponseType);
+                    responseBody = await Encoder.DeserializeResponseAsync(response.Content, request.ResponseType).ConfigureAwait(false);
                 }
                 return new HttpResponse(response.Headers, response.StatusCode, responseBody);
             }
             else
             {
-				var responseBody = await response.Content.ReadAsStringAsync();
+				var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				throw new HttpException(response.StatusCode, response.Headers, responseBody);
             }
         }

@@ -20,12 +20,12 @@ namespace PayPalHttp
 
         public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
-            if (!(request.Body is IDictionary))
+            if (request.Body is not IDictionary)
             {
                 throw new IOException("Request requestBody must be Map<string, string> when Content-Type is application/x-www-form-urlencoded");
             }
 
-            return await Task.FromResult(new FormUrlEncodedContent((Dictionary<string, string>)request.Body));
+            return await Task.FromResult(new FormUrlEncodedContent((Dictionary<string, string>)request.Body)).ConfigureAwait(false);
         }
 
         public Regex GetContentRegEx()
