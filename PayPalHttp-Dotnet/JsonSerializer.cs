@@ -14,26 +14,20 @@ namespace PayPalHttp
 
         public async Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
-            var jsonSerializer = new DataContractJsonSerializer(responseType);            
-            using (var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync().ConfigureAwait(false))))
-            {
-                return jsonSerializer.ReadObject(ms);
-            }
+            var jsonSerializer = new DataContractJsonSerializer(responseType);
+            using var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(await content.ReadAsStringAsync().ConfigureAwait(false)));
+            return jsonSerializer.ReadObject(ms);
         }
 
         public async Task<HttpContent> EncodeAsync(HttpRequest request)
         {
             var jsonSerializer = new DataContractJsonSerializer(request.Body.GetType());
 
-            using (var ms = new MemoryStream())
-            {
-                jsonSerializer.WriteObject(ms, request.Body);
-                ms.Position = 0;
-                using (var sr = new StreamReader(ms))
-                {
-                    return new StringContent(await sr.ReadToEndAsync().ConfigureAwait(false), System.Text.Encoding.UTF8, RegExPattern);
-                }
-            }
+            using var ms = new MemoryStream();
+            jsonSerializer.WriteObject(ms, request.Body);
+            ms.Position = 0;
+            using var sr = new StreamReader(ms);
+            return new StringContent(await sr.ReadToEndAsync().ConfigureAwait(false), System.Text.Encoding.UTF8, RegExPattern);
         }
 
         public Regex GetContentRegEx()

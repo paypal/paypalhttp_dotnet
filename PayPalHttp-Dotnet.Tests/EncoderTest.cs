@@ -368,16 +368,14 @@ namespace PayPalHttp.Tests
         private static async Task<byte[]> GzipAsync(string source)
         {
             var bytes = Encoding.UTF8.GetBytes(source);
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream())
+            using var msi = new MemoryStream(bytes);
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(mso, CompressionMode.Compress))
             {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress))
-                {
-                    await msi.CopyToAsync(gs).ConfigureAwait(false);
-                }
-
-                return mso.ToArray();
+                await msi.CopyToAsync(gs).ConfigureAwait(false);
             }
+
+            return mso.ToArray();
         }
     }
 }

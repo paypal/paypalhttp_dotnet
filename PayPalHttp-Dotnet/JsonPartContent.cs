@@ -20,15 +20,11 @@ namespace PayPalHttp
         private static string SerializeJson(object json) {
             var jsonSerializer = new DataContractJsonSerializer(json.GetType());
 
-            using (var ms = new MemoryStream())
-            {
-                jsonSerializer.WriteObject(ms, json);
-                ms.Position = 0;
-                using (var sr = new StreamReader(ms))
-                {
-                    return sr.ReadToEnd();
-                }
-            }
+            using var ms = new MemoryStream();
+            jsonSerializer.WriteObject(ms, json);
+            ms.Position = 0;
+            using var sr = new StreamReader(ms);
+            return sr.ReadToEnd();
         }
     }
 }

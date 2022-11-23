@@ -11,14 +11,14 @@ namespace PayPalHttp
         private readonly System.Net.Http.HttpClient _client;
         private readonly List<IInjector> _injectors = new();
         protected TimeSpan _timeout = TimeSpan.FromMinutes(5); //5 minute http pool default timeout
-        protected readonly Environment _environment;
+        protected readonly IEnvironment _environment;
 
         private static readonly ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
 
         public Encoder Encoder { get; private set; }
 
 
-        public HttpClient(Environment environment)
+        public HttpClient(IEnvironment environment)
         {
             _environment = environment;
             Encoder = new Encoder();

@@ -120,15 +120,13 @@ namespace PayPalHttp
 
         private static async Task<string> GunzipAsync(byte[] source)
         {
-            using (var mso = new MemoryStream())
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(new MemoryStream(source), CompressionMode.Decompress))
             {
-                using (var gs = new GZipStream(new MemoryStream(source), CompressionMode.Decompress))
-                {
-                    await gs.CopyToAsync(mso).ConfigureAwait(false);
-                }
-
-                return Encoding.UTF8.GetString(mso.ToArray());
+                await gs.CopyToAsync(mso).ConfigureAwait(false);
             }
+
+            return Encoding.UTF8.GetString(mso.ToArray());
         }
     }
 }

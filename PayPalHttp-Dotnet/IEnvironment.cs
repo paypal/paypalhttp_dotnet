@@ -1,7 +1,7 @@
 ﻿using System;
 namespace PayPalHttp
 {
-    public interface Environment
+    public interface IEnvironment
     {
         string BaseUrl();
     }
