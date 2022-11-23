@@ -14,17 +14,17 @@ namespace PayPalHttp
 
         public HttpRequest(string path, HttpMethod method, Type responseType)
         {
-            this.Path = path;
-            this.ResponseType = responseType;
+            Path = path;
+            ResponseType = responseType;
             base.Method = method;
-            this.ContentEncoding = "identity";
+            ContentEncoding = "identity";
         }
 
         public HttpRequest(string path, HttpMethod method) : this(path, method, typeof(void)) {}
 
         public T Clone<T>() where T: HttpRequest
         {
-            return (T) this.MemberwiseClone();
+            return (T) MemberwiseClone();
         }
 	}
 }

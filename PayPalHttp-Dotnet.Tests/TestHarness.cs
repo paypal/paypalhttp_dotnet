@@ -4,7 +4,7 @@ using WireMock.Server;
 namespace PayPalHttp.Tests
 {
 
-	public class TestEnvironment : PayPalHttp.Environment
+	public class TestEnvironment : PayPalHttp.IEnvironment
 	{
 
 		public TestEnvironment(int port, bool useSSL = false)

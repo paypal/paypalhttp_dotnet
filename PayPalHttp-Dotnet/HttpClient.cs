@@ -9,16 +9,16 @@ namespace PayPalHttp
     public class HttpClient
     {               
         private readonly System.Net.Http.HttpClient _client;
-        private readonly List<IInjector> _injectors = new List<IInjector>();
+        private readonly List<IInjector> _injectors = new();
         protected TimeSpan _timeout = TimeSpan.FromMinutes(5); //5 minute http pool default timeout
-        protected readonly Environment _environment;
+        protected readonly IEnvironment _environment;
 
-        private static ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
+        private static readonly ConcurrentDictionary<string, System.Net.Http.HttpClient> ClientDictionary = new();
 
         public Encoder Encoder { get; private set; }
 
 
-        public HttpClient(Environment environment)
+        public HttpClient(IEnvironment environment)
         {
             _environment = environment;
             Encoder = new Encoder();
@@ -40,8 +40,10 @@ namespace PayPalHttp
         protected virtual System.Net.Http.HttpClient GetHttpClient(string baseUrl)
         {
             return ClientDictionary.GetOrAdd(baseUrl.ToLower(), (bUrl) => {
-                var client = new System.Net.Http.HttpClient(GetHttpSocketHandler());
-                client.BaseAddress = new Uri(baseUrl);
+                var client = new System.Net.Http.HttpClient(GetHttpSocketHandler())
+                {
+                    BaseAddress = new Uri(baseUrl)
+                };
                 client.DefaultRequestHeaders.Add("User-Agent", GetUserAgent());
 
                 return client;
@@ -57,7 +59,7 @@ namespace PayPalHttp
         {
             if (injector != null)
             {
-                this._injectors.Add(injector);
+                _injectors.Add(injector);
             }
         }
 
@@ -71,30 +73,30 @@ namespace PayPalHttp
             var request = req.Clone<T>();
 
             foreach (var injector in _injectors) {
-                injector.Inject(request);
+                request = await injector.InjectAsync(request).ConfigureAwait(false);
             }
 
-            request.RequestUri = new Uri(this._environment.BaseUrl() + request.Path);
+            request.RequestUri = new Uri(_environment.BaseUrl() + request.Path);
 
             if (request.Body != null)
             {
-                request.Content = await Encoder.SerializeRequestAsync(request);
+                request.Content = await Encoder.SerializeRequestAsync(request).ConfigureAwait(false);
             }
 
-			var response = await _client.SendAsync(request);
+			var response = await _client.SendAsync(request).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
                 object responseBody = null;
                 if (response.Content.Headers.ContentType != null)
                 {
-                    responseBody = await Encoder.DeserializeResponseAsync(response.Content, request.ResponseType);
+                    responseBody = await Encoder.DeserializeResponseAsync(response.Content, request.ResponseType).ConfigureAwait(false);
                 }
                 return new HttpResponse(response.Headers, response.StatusCode, responseBody);
             }
             else
             {
-				var responseBody = await response.Content.ReadAsStringAsync();
+				var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				throw new HttpException(response.StatusCode, response.Headers, responseBody);
             }
         }

@@ -18,7 +18,7 @@
 	<RepositoryUrl>https://github.com/dlmelendez/paypalhttp_dotnet.git</RepositoryUrl>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-	<Version>1.7.0</Version>
+	<Version>1.8.0</Version>
 	  <PackageProjectUrl>https://github.com/dlmelendez/paypalhttp_dotnet</PackageProjectUrl>
 	  <!--<DebugType>Full</DebugType>-->
 	  <!-- DebugType Full is needed for test code coverage, but .nuget symbols doesn't like it-->
