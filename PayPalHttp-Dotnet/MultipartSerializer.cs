@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PayPalHttp
 {
-    public class MultipartSerializer : ISerializer
+    public partial class MultipartSerializer : ISerializer
     {
         private const string RegExPattern = "^multipart/.*$";
+#if NET7_0_OR_GREATER
+        private static readonly Regex _pattern = ContentTypeRegEx();
+#else
         private static readonly Regex _pattern = new(RegExPattern, RegexOptions.Compiled);
-
+#endif
         public Task<object> DecodeAsync(HttpContent content, Type responseType)
         {
             throw new IOException($"Unable to deserialize Content-Type: multipart/form-data.");
@@ -22,21 +23,15 @@ namespace PayPalHttp
 
         private static string GetMimeMapping(string filename)
         {
-            switch (Path.GetExtension(filename))
+            return Path.GetExtension(filename) switch
             {
-                case ".jpeg":
-                    return "image/jpeg";
-                case ".jpg":
-                    return "image/jpeg";
-                case ".gif":
-                    return "image/gif";
-                case ".png":
-                    return "image/png";
-                case ".pdf":
-                    return "application/pdf";
-                default:
-                    return "application/octet-stream";
-            }
+                ".jpeg" => "image/jpeg",
+                ".jpg" => "image/jpeg",
+                ".gif" => "image/gif",
+                ".png" => "image/png",
+                ".pdf" => "application/pdf",
+                _ => "application/octet-stream",
+            };
         }
 
         public async Task<HttpContent> EncodeAsync(HttpRequest request)
@@ -52,31 +47,33 @@ namespace PayPalHttp
 
             foreach (KeyValuePair<string, object> item in body)
             {
-                if (item.Value is FileStream)
+                if (item.Value is FileStream file)
                 {
-                    var file = (FileStream)item.Value;
-                    try {
+                    try
+                    {
                         MemoryStream memoryStream = new();
                         await file.CopyToAsync(memoryStream).ConfigureAwait(false);
                         var fileContent = new ByteArrayContent(memoryStream.ToArray());
                         var fileName = Path.GetFileName(file.Name);
                         // This is necessary to quote values since the web server is picky; .NET normally does not quote
-                        fileContent.Headers.Add("Content-Disposition", "form-data; name=\"" + (string)item.Key + "\"; filename=\"" + fileName + "\"");
-                        string mimeType = MultipartSerializer.GetMimeMapping(fileName);
+                        fileContent.Headers.Add("Content-Disposition", "form-data; name=\"" + item.Key + "\"; filename=\"" + fileName + "\"");
+                        string mimeType = GetMimeMapping(fileName);
                         fileContent.Headers.Add("Content-Type", mimeType);
 
-                        form.Add(fileContent, (string)item.Key);
-                    } finally {
+                        form.Add(fileContent, item.Key);
+                    }
+                    finally
+                    {
                         file.Dispose();
                     }
                 }
-                else if (item.Value is HttpContent)
+                else if (item.Value is HttpContent httpContent)
                 {
-                    form.Add((HttpContent)item.Value, (string)item.Key);
+                    form.Add(httpContent, item.Key);
                 }
                 else
                 {
-                    form.Add(new StringContent((string)item.Value), (string)item.Key);
+                    form.Add(new StringContent((string)item.Value), item.Key);
                 }
             }
 
@@ -95,5 +92,10 @@ namespace PayPalHttp
         {
             return RegExPattern;
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(RegExPattern, RegexOptions.Compiled)]
+        private static partial Regex ContentTypeRegEx();
+#endif
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PayPalHttp
@@ -52,12 +50,7 @@ namespace PayPalHttp
 
             request.ContentType = request.ContentType.ToLower();
             
-            ISerializer serializer = GetSerializer(request.ContentType);
-            if (serializer == null)
-            {
-                throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
-            }
-
+            ISerializer serializer = GetSerializer(request.ContentType) ?? throw new IOException($"Unable to serialize request with Content-Type {request.ContentType}. Supported encodings are {GetSupportedContentTypes()}");
             var content = await serializer.EncodeAsync(request).ConfigureAwait(false);
 
             if ("gzip".Equals(request.ContentEncoding))
@@ -77,12 +70,7 @@ namespace PayPalHttp
             }
             var contentType = content.Headers.ContentType.ToString();
             contentType = contentType.ToLower();
-            ISerializer serializer = GetSerializer(contentType);
-            if (serializer == null)
-            {
-                throw new IOException($"Unable to deserialize response with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
-            }
-
+            ISerializer serializer = GetSerializer(contentType) ?? throw new IOException($"Unable to deserialize response with Content-Type {contentType}. Supported encodings are {GetSupportedContentTypes()}");
             var contentEncoding = content.Headers.ContentEncoding.FirstOrDefault();
 
             if ("gzip".Equals(contentEncoding))

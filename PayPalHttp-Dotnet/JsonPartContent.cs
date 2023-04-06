@@ -1,10 +1,7 @@
-using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace PayPalHttp
 {

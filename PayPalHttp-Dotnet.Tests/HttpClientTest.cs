@@ -101,7 +101,7 @@ namespace PayPalHttp.Tests
             );
 
             var request = new HttpRequest("/", HttpMethod.Get);
-            var resp = await Client().Execute(request);
+            _ = await Client().Execute(request);
 
             Assert.Equal("PayPalHttp-Dotnet HTTP/1.1", GetLastRequest().RequestMessage.Headers["User-Agent"]);
         }
@@ -155,7 +155,7 @@ namespace PayPalHttp.Tests
 
             var request = new SimpleRequest();
 
-            var response = await Client().Execute(request);
+            _ = await Client().Execute(request);
 
             var headerCount = 0;
             foreach (var header in request.Headers)
@@ -181,7 +181,7 @@ namespace PayPalHttp.Tests
 
             client.AddInjector(new TestInjector());
 
-            var response = await client.Execute(request);
+            _ = await client.Execute(request);
             Assert.Equal("Custom Injector", GetLastRequest().RequestMessage.Headers["User-Agent"]);
         }
 
