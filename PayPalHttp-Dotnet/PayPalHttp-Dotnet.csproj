@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	<TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
-	<LangVersion>10.0</LangVersion>
+	<LangVersion>11.0</LangVersion>
     <Title>ElCamino.PayPalHttp</Title>
 	<AssemblyName>ElCamino.PayPalHttp</AssemblyName>
 	  
@@ -18,7 +18,7 @@
 	<RepositoryUrl>https://github.com/dlmelendez/paypalhttp_dotnet.git</RepositoryUrl>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-	<Version>1.8.0</Version>
+	<Version>1.9.0</Version>
 	  <PackageProjectUrl>https://github.com/dlmelendez/paypalhttp_dotnet</PackageProjectUrl>
 	  <!--<DebugType>Full</DebugType>-->
 	  <!-- DebugType Full is needed for test code coverage, but .nuget symbols doesn't like it-->
